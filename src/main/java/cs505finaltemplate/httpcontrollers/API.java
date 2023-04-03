@@ -21,7 +21,6 @@ import java.util.Map;
 // reset 
 //
 
-
 @Path("/api")
 public class API {
 
@@ -34,7 +33,6 @@ public class API {
         gson = new Gson();
     }
 
-
     @GET
     @Path("/getteam")
     @Produces(MediaType.APPLICATION_JSON)
@@ -42,13 +40,12 @@ public class API {
         String responseString = "{}";
         try {
             System.out.println("WHAT");
-            Map<String,String> responseMap = new HashMap<>();
+            Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
             responseMap.put("Team_members_sids", "[0]");
-            responseMap.put("app_status_code","0");
+            responseMap.put("app_status_code", "0");
 
             responseString = gson.toJson(responseMap);
-
 
         } catch (Exception ex) {
 
@@ -62,19 +59,19 @@ public class API {
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
 
-    @GET 
+    @GET
     @Path("/rest")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getRest() {
         String responseString = "{}";
         try {
             System.out.println("WHAT");
-            Map<String,String> responseMap = new HashMap<>();
+            Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
             responseMap.put("Team_members_sids", "[0]");
-            responseMap.put("app_status_code","0");
+            responseMap.put("app_status_code", "0");
             responseString = gson.toJson(responseMap);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
             String exceptionAsString = sw.toString();
@@ -83,7 +80,6 @@ public class API {
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
-
 
     @GET
     @Path("/getlastcep")
@@ -92,9 +88,9 @@ public class API {
         String responseString = "{}";
         try {
 
-            //generate a response
-            Map<String,String> responseMap = new HashMap<>();
-            responseMap.put("lastoutput",Launcher.lastCEPOutput);
+            // generate a response
+            Map<String, String> responseMap = new HashMap<>();
+            responseMap.put("lastoutput", Launcher.lastCEPOutput);
             responseString = gson.toJson(responseMap);
 
         } catch (Exception ex) {
@@ -109,5 +105,60 @@ public class API {
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
 
+    @GET
+    @Path("/getteam")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTeam(@HeaderParam("X-Auth-API-Key") String authKey) {
+        // @todo: put PuJiao's SID in response string
+        String responseString = "{\"team_name\": \"DB Dogs\", \"Team_members_sids\":, [12028230,PuJiaosID], \"app_status_code\": 1}";
+        try {
+
+        } catch (Exception ex) {
+
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/reset")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reset(@HeaderParam("X-Auth-API-Key") String authKey) {
+        // @todo: status code 0 means fail, 1 means success. make that work.
+        String responseString = "{\"reset_status_code\": }";
+        try {
+
+        } catch (Exception ex) {
+
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/zipalertlist")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getZipAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
+        // @todo: implement
+        String responseString = "{\"ziplist\": }";
+        try {
+
+        } catch (Exception ex) {
+
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/alertlist")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
+        // @todo: implement - state_status = 0 = not alert, 1 = alert
+        String responseString = "{\"state_status\": }";
+        try {
+
+        } catch (Exception ex) {
+
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
 
 }
