@@ -12,8 +12,16 @@ public class TestingData {
     public List<String> contact_list;
     public List<String> event_list;
 
-    public  TestingData() {
-
+    public  TestingData( String patient_name, String patient_mrn, int patient_zipcode, int patient_status, List<String> contact_list, List<String> event_list) {
+        //default constructor
+        this.patient_name = patient_name;
+        this.patient_mrn = patient_mrn;
+        this.patient_zipcode = patient_zipcode;
+        this.patient_status = patient_status;
+        this.contact_list = contact_list;
+        this.event_list = event_list;
     }
-
 }
+
+
+

@@ -125,4 +125,14 @@ public class CEPEngine {
         return sinkString;
     }
 
+    public void cleadDB() {
+        try {
+            // clean cep database
+            String query = "";
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }

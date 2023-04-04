@@ -77,11 +77,20 @@ public class TopicConnector {
 
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
                 for (TestingData testingData : incomingList) {
-
+                    // conditions to ignore imperfect data
                     //Data to send to CEP
                     Map<String,String> zip_entry = new HashMap<>();
                     zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
+
+                    Map<String, List<String>> contact_list_entry = new HashMap<>();
+                    contact_list_entry.put("contact_list",testingData.contact_list);
+
+
+
+
                     String testInput = gson.toJson(zip_entry);
+
+                    
                     //uncomment for debug
                     //System.out.println("testInput: " + testInput);
 
@@ -99,6 +108,13 @@ public class TopicConnector {
                     System.out.println("\tcontact_list = " + testingData.contact_list);
                     System.out.println("\tevent_list = " + testingData.event_list);
                      */
+
+                    // TODO 
+                    // Data to send to orientDB
+                    // Map<String,String> zip_entry = new HashMap<>();
+                    // zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
+
+                    
                 }
 
             };

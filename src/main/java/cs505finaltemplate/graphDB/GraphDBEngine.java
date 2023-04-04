@@ -90,11 +90,17 @@ public class GraphDBEngine {
         rs.close(); //REMEMBER TO ALWAYS CLOSE THE RESULT SET!!!
     }
 
+
+
     private void clearDB(ODatabaseSession db) {
 
         String query = "DELETE VERTEX FROM patient";
         db.command(query);
 
+    }
+    public void resetDB()
+    {
+        clearDB(db);
     }
 
 }
