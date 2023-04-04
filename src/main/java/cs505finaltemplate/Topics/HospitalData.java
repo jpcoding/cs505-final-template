@@ -7,7 +7,7 @@ public class HospitalData {
     // "patient_name": "Henrietta Cook",
     // "patient_mrn": "1def2240-b4e8-11ec-a016-ac87a3187c5f",
     // "patient_status": 2
-    public int hospital_id;
+    public String hospital_id;
     public String patient_name;
     public String patient_mrn;
     public int patient_status;

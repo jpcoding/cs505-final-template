@@ -128,7 +128,7 @@ public class API {
         try {
 
 
-            Launcher.graphDBEngine.clearDB(graphDBEngine);
+            Launcher.graphDBEngine.resetDB();
 
 
         } catch (Exception ex) {

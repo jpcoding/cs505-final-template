@@ -12,6 +12,8 @@ import com.orientechnologies.orient.core.sql.executor.OResultSet;
 
 public class GraphDBEngine {
 
+    private OrientDB orient = new OrientDB("remote:localhost", OrientDBConfig.defaultConfig());
+    private ODatabaseSession db = orient.open("test", "root", "rootpwd");
 
     //!!! CODE HERE IS FOR EXAMPLE ONLY, YOU MUST CHECK AND MODIFY!!!
     public GraphDBEngine() {
@@ -21,10 +23,6 @@ public class GraphDBEngine {
 
         //use the orientdb dashboard to create a new database
         //see class notes for how to use the dashboard
-
-
-        OrientDB orient = new OrientDB("remote:localhost", OrientDBConfig.defaultConfig());
-        ODatabaseSession db = orient.open("test", "root", "rootpwd");
 
         clearDB(db);
 
@@ -75,6 +73,14 @@ public class GraphDBEngine {
         return result;
     }
 
+    private OVertex createHospital(ODatabaseSession db, String hospital_id) {
+        OVertex result = db.newVertex("hospital");
+        result.setProperty("hospital_id", hospital_id);
+        result.save();
+        return result;
+    }
+    
+
     private void getContacts(ODatabaseSession db, String patient_mrn) {
 
         String query = "TRAVERSE inE(), outE(), inV(), outV() " +
@@ -93,11 +99,10 @@ public class GraphDBEngine {
 
 
     private void clearDB(ODatabaseSession db) {
-
         String query = "DELETE VERTEX FROM patient";
         db.command(query);
-
     }
+
     public void resetDB()
     {
         clearDB(db);
