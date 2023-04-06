@@ -36,13 +36,13 @@ public class API {
     @GET
     @Path("/getteam")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getteam() {
+    public Response getTeam() {
         String responseString = "{}";
         try {
             System.out.println("WHAT");
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
-            responseMap.put("Team_members_sids", "[0]");
+            responseMap.put("Team_members_sids", "[12028230,PuJiaosID]");// @todo: put PuJiao's SID in response string
             responseMap.put("app_status_code", "0");
 
             responseString = gson.toJson(responseMap);
@@ -59,6 +59,7 @@ public class API {
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
 
+    // @todo: do we need this function...?
     @GET
     @Path("/rest")
     @Produces(MediaType.APPLICATION_JSON)
@@ -67,7 +68,7 @@ public class API {
         try {
             System.out.println("WHAT");
             Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("team_name", "templateTeam");
+            responseMap.put("team_name", "DB Dogs");
             responseMap.put("Team_members_sids", "[0]");
             responseMap.put("app_status_code", "0");
             responseString = gson.toJson(responseMap);
@@ -106,20 +107,6 @@ public class API {
     }
 
     @GET
-    @Path("/getteam")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeam(@HeaderParam("X-Auth-API-Key") String authKey) {
-        // @todo: put PuJiao's SID in response string
-        String responseString = "{\"team_name\": \"DB Dogs\", \"Team_members_sids\":, [12028230,PuJiaosID], \"app_status_code\": 1}";
-        try {
-
-        } catch (Exception ex) {
-
-        }
-        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
-    }
-
-    @GET
     @Path("/reset")
     @Produces(MediaType.APPLICATION_JSON)
     public Response reset(@HeaderParam("X-Auth-API-Key") String authKey) {
@@ -127,9 +114,7 @@ public class API {
         String responseString = "{\"reset_status_code\": }";
         try {
 
-
             Launcher.graphDBEngine.resetDB();
-
 
         } catch (Exception ex) {
 
@@ -137,6 +122,7 @@ public class API {
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
 
+    // CEP API functions
     @GET
     @Path("/zipalertlist")
     @Produces(MediaType.APPLICATION_JSON)
@@ -165,4 +151,46 @@ public class API {
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
 
+    // graph API functions
+    @GET
+    @Path("/getconfirmedcontacts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConfirmedContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
+        // @todo: implement
+        String responseString = "{\"ziplist\": }";
+        try {
+
+        } catch (Exception ex) {
+
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/getpossiblecontacts")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPossibleContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
+        // @todo: implement
+        String responseString = "{\"\": }";
+        try {
+
+        } catch (Exception ex) {
+
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/getpatientstatus")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPatientStatus(@HeaderParam("X-Auth-API-Key") String authKey) {
+        // @todo: implement
+        String responseString = "{\"\": }";
+        try {
+
+        } catch (Exception ex) {
+
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
 }
