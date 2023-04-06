@@ -14,8 +14,7 @@ public class CEPEngine {
 
     private SiddhiManager siddhiManager;
     private SiddhiAppRuntime siddhiAppRuntime;
-    private Map<String,String> topicMap;
-
+    private Map<String, String> topicMap;
 
     private Gson gson;
 
@@ -42,39 +41,40 @@ public class CEPEngine {
 
         // Creating Siddhi Manager
         siddhiManager = new SiddhiManager();
-        siddhiManager.setExtension("sourceMapper:json",JsonClassSource);
-        siddhiManager.setExtension("sinkMapper:json",JsonClassSink);
+        siddhiManager.setExtension("sourceMapper:json", JsonClassSource);
+        siddhiManager.setExtension("sinkMapper:json", JsonClassSink);
         gson = new Gson();
     }
 
-
-    public void createCEP(String inputStreamName, String outputStreamName, String inputStreamAttributesString, String outputStreamAttributesString,String queryString) {
+    public void createCEP(String inputStreamName, String outputStreamName, String inputStreamAttributesString,
+            String outputStreamAttributesString, String queryString) {
 
         try {
 
             String inputTopic = UUID.randomUUID().toString();
             String outputTopic = UUID.randomUUID().toString();
 
-            topicMap.put(inputStreamName,inputTopic);
-            topicMap.put(outputStreamName,outputTopic);
+            topicMap.put(inputStreamName, inputTopic);
+            topicMap.put(outputStreamName, outputTopic);
 
             String sourceString = getSourceString(inputStreamAttributesString, inputTopic, inputStreamName);
             System.out.println("sourceString: [" + sourceString + "]");
-            String sinkString = getSinkString(outputTopic,outputStreamName,outputStreamAttributesString);
+            String sinkString = getSinkString(outputTopic, outputStreamName, outputStreamAttributesString);
             System.out.println("sinkString: [" + sinkString + "]");
-            //Generating runtime
+            // Generating runtime
 
-            siddhiAppRuntime = siddhiManager.createSiddhiAppRuntime(sourceString + " " + sinkString + " " + queryString);
+            siddhiAppRuntime = siddhiManager
+                    .createSiddhiAppRuntime(sourceString + " " + sinkString + " " + queryString);
 
-            InMemoryBroker.Subscriber subscriberTest = new OutputSubscriber(outputTopic,outputStreamName);
+            InMemoryBroker.Subscriber subscriberTest = new OutputSubscriber(outputTopic, outputStreamName);
 
-            //subscribe to "inMemory" broker per topic
+            // subscribe to "inMemory" broker per topic
             InMemoryBroker.subscribe(subscriberTest);
 
-            //Starting event processing
+            // Starting event processing
             siddhiAppRuntime.start();
 
-            } catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -84,25 +84,25 @@ public class CEPEngine {
         try {
 
             if (topicMap.containsKey(streamName)) {
-                //InMemoryBroker.publish(topicMap.get(streamName), getByteGenericDataRecordFromString(schemaMap.get(streamName),jsonPayload));
+                // InMemoryBroker.publish(topicMap.get(streamName),
+                // getByteGenericDataRecordFromString(schemaMap.get(streamName),jsonPayload));
                 InMemoryBroker.publish(topicMap.get(streamName), jsonPayload);
 
             } else {
                 System.out.println("input error : no schema");
             }
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-
 
     private String getSourceString(String inputStreamAttributesString, String topic, String streamName) {
         String sourceString = null;
         try {
 
-            sourceString  = "@source(type='inMemory', topic='" + topic + "', @map(type='json')) " +
-                    "define stream " + streamName + " (" + inputStreamAttributesString + "); ";
+            sourceString = "@source(type='inMemory', topic='" + topic + "', @map(type='json')) " + "define stream "
+                    + streamName + " (" + inputStreamAttributesString + "); ";
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -115,8 +115,8 @@ public class CEPEngine {
         String sinkString = null;
         try {
 
-            sinkString = "@sink(type='inMemory', topic='" + topic + "', @map(type='json')) " +
-                    "define stream " + streamName + " (" + outputSchemaString + "); ";
+            sinkString = "@sink(type='inMemory', topic='" + topic + "', @map(type='json')) " + "define stream "
+                    + streamName + " (" + outputSchemaString + "); ";
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -125,11 +125,13 @@ public class CEPEngine {
         return sinkString;
     }
 
+    // @todo: do we need to clean a CEP db? it doesn't really store anything,
+    // does it...?
     public void cleadDB() {
         try {
             // clean cep database
             String query = "";
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
