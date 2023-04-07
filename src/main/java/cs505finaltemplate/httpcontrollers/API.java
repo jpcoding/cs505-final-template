@@ -59,29 +59,6 @@ public class API {
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
 
-    // @todo: do we need this function...?
-    @GET
-    @Path("/rest")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getRest() {
-        String responseString = "{}";
-        try {
-            System.out.println("WHAT");
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("team_name", "DB Dogs");
-            responseMap.put("Team_members_sids", "[0]");
-            responseMap.put("app_status_code", "0");
-            responseString = gson.toJson(responseMap);
-        } catch (Exception ex) {
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-            ex.printStackTrace();
-            return Response.status(500).entity(exceptionAsString).build();
-        }
-        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
-    }
-
     @GET
     @Path("/getlastcep")
     @Produces(MediaType.APPLICATION_JSON)
