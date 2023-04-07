@@ -128,6 +128,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getZipAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
         // @todo: implement
+        // We define alert state as a growth of 2X over two batches of messages.
         String responseString = "{\"ziplist\": }";
         try {
 
@@ -142,6 +143,8 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
         // @todo: implement - state_status = 0 = not alert, 1 = alert
+        // alert on statewide when at least five zipcodes are in alert state
+        // (based on RT1) within the same 15 second window.
         String responseString = "{\"state_status\": }";
         try {
 
