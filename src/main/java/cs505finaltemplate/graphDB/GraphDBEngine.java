@@ -9,6 +9,11 @@ import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import cs505finaltemplate.Topics.HospitalData;
+import cs505finaltemplate.Topics.TestingData;
+import cs505finaltemplate.Topics.VaxData;
+
+
 
 public class GraphDBEngine {
 
@@ -29,6 +34,7 @@ public class GraphDBEngine {
         //create classes
         OClass patient = db.getClass("patient");
 
+
         if (patient == null) {
             patient = db.createVertexClass("patient");
         }
@@ -41,6 +47,21 @@ public class GraphDBEngine {
         if (db.getClass("contact_with") == null) {
             db.createEdgeClass("contact_with");
         }
+
+        OClass hospital = db.getClass("hospital");
+        if (hospital == null) {
+            hospital = db.createVertexClass("hospital");
+        }
+
+        if(hospital.getProperty("hospital_id") == null) {
+            hospital.createProperty("hospital_id", OType.STRING);
+            hospital.createIndex("hospital_id_index", OClass.INDEX_TYPE.NOTUNIQUE, "hospital_id");
+        }
+
+        if (db.getClass("hospitalized_at") == null) {
+            db.createEdgeClass("hospitalized_at");
+        }
+
 
 
         OVertex patient_0 = createPatient(db, "mrn_0");
@@ -66,6 +87,116 @@ public class GraphDBEngine {
 
     }
 
+    public void addPatient(TestingData patient) {
+        // If the node already exists, update it
+        // If the node does not exist, create it
+        // If the node has a contact, create an edge between the two nodes
+        String query = "SELECT FROM patient WHERE patient_mrn = ?";
+        OResultSet rs = db.query(query, patient.patient_mrn);
+        if (rs.hasNext()) {
+            OResult item = rs.next();
+            if (item.isVertex()) {
+                OVertex result = item.getVertex().get();
+                result.setProperty("testing_id", patient.testing_id);
+                result.setProperty("patient_mrn", patient.patient_mrn);
+                result.setProperty("patient_name", patient.patient_name);
+                result.setProperty("patient_status", patient.patient_status);
+                result.setProperty("patient_zipcode", patient.patient_zipcode);
+                result.setProperty("patient_status", patient.patient_status);
+                result.setProperty("contact_list", patient.contact_list);
+                result.save();
+                for (String contact : patient.contact_list) {
+                    rs = db.query(query, contact);
+                    if (rs.hasNext()) {
+                        item = rs.next();
+                        if (item.isVertex()) {
+                            OVertex  v = item.getVertex().orElse(null);
+                            OEdge edge = result.addEdge(v, "contact_with");
+                            edge.save();
+                        }
+                    } else {
+                        OVertex newContact = db.newVertex("patient");
+                        newContact.setProperty("patient_mrn", contact);
+                        newContact.save();
+                        OEdge edge = result.addEdge(newContact, "contact_with");
+                        edge.save();
+                    }
+//                    rs.close();
+                }
+            }
+            rs.close();
+        } else {
+            OVertex result = db.newVertex("patient");
+            result.setProperty("testing_id", patient.testing_id);
+            result.setProperty("patient_mrn", patient.patient_mrn);
+            result.setProperty("patient_name", patient.patient_name);
+            result.setProperty("patient_status", patient.patient_status);
+            result.setProperty("patient_zipcode", patient.patient_zipcode);
+            result.setProperty("patient_status", patient.patient_status);
+            result.setProperty("contact_list", patient.contact_list);
+            result.save();
+            for (String contact : patient.contact_list) {
+                rs = db.query(query, contact);
+                if (rs.hasNext()) {
+                    OResult item = rs.next();
+                    if (item.isVertex()) {
+                        OVertex v = item.getVertex().get();
+                        OEdge edge = result.addEdge(v, "contact_with");
+                        edge.save();
+                    }
+                } else {
+                    OVertex newContact = db.newVertex("patient");
+                    newContact.setProperty("patient_mrn", contact);
+                    newContact.save();
+                    OEdge edge = result.addEdge(newContact, "contact_with");
+                    edge.save();
+                }
+                rs.close();
+            }
+        }
+    }
+
+    public void addHospital(HospitalData hospital){
+        String query = "SELECT FROM hospital WHERE  = ?";
+        OResultSet rs = db.query(query,hospital.patient_mrn);
+        OResult item = rs.next();
+        if(item.isVertex())
+        {
+            OVertex thisHospital = item.getVertex().get();
+            thisHospital.setProperty("hospital_id", hospital.hospital_id);
+            thisHospital.save();
+            String patientQuery = "SELECT FROM patient WHERE patient_mrn = ?";
+            rs = db.query(patientQuery, hospital.patient_mrn);
+            if(rs.hasNext())
+            {
+                item = rs.next();
+                if(item.isVertex())
+                {
+                    OVertex thisPatient = item.getVertex().get();
+                    OEdge edge = thisPatient.addEdge(thisHospital, "hospitalized_at");
+                    edge.save();
+                }
+            }
+            else
+            {
+                OVertex newPatient = db.newVertex("patient");
+                newPatient.setProperty("patient_mrn", hospital.patient_mrn);
+                newPatient.setProperty("patient_name", hospital.patient_name);
+                newPatient.save();
+                OEdge edge = newPatient.addEdge(thisHospital, "hospitalized_at");
+                edge.save();
+            }
+
+        }
+
+    }
+
+    public String checkContacts(String patient_mrn) {
+
+        return null;
+    }
+
+
     private OVertex createPatient(ODatabaseSession db, String patient_mrn) {
         OVertex result = db.newVertex("patient");
         result.setProperty("patient_mrn", patient_mrn);
@@ -79,7 +210,8 @@ public class GraphDBEngine {
         result.save();
         return result;
     }
-    
+
+
 
     private void getContacts(ODatabaseSession db, String patient_mrn) {
 

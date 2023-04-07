@@ -42,7 +42,7 @@ public class API {
             System.out.println("WHAT");
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
-            responseMap.put("Team_members_sids", "[12028230,PuJiaosID]");// @todo: put PuJiao's SID in response string
+            responseMap.put("Team_members_sids", "[12028230,12648912]");// @todo: put PuJiao's SID in response string
             responseMap.put("app_status_code", "0");
 
             responseString = gson.toJson(responseMap);

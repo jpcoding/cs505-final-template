@@ -1,6 +1,11 @@
 package cs505finaltemplate.Topics;
 
 import java.util.List;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import com.google.gson.Gson; 
+import com.google.gson.GsonBuilder;
 
 public class HospitalData {
     // "hospital_id": "12142728",
@@ -12,7 +17,7 @@ public class HospitalData {
     public String patient_mrn;
     public int patient_status;
 
-    public HospitalData(int hospital_id, String patient_name, String patient_mrn, int patient_status) {
+    public HospitalData(String hospital_id, String patient_name, String patient_mrn, int patient_status) {
         this.hospital_id = hospital_id;
         this.patient_name = patient_name;
         this.patient_mrn = patient_mrn;

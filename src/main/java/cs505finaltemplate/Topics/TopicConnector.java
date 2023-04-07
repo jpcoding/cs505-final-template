@@ -77,25 +77,20 @@ public class TopicConnector {
 
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
                 for (TestingData testingData : incomingList) {
+                    //Check if this data is perfect data first.
+
+
                     // conditions to ignore imperfect data
-                    //Data to send to CEP
-                    Map<String,String> zip_entry = new HashMap<>();
-                    zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
-
-                    Map<String, List<String>> contact_list_entry = new HashMap<>();
-                    contact_list_entry.put("contact_list",testingData.contact_list);
-
-
-
-
-                    String testInput = gson.toJson(zip_entry);
-
-                    
+                    //Data to send to CEPEngine
+                    Gson patient_info = new Gson();
+                    String patient_info_jsonstring = patient_info.toJson(testingData);
                     //uncomment for debug
                     //System.out.println("testInput: " + testInput);
 
                     //insert into CEP
-                    Launcher.cepEngine.input("testInStream",testInput);
+                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
+
+                    Launcher.graphDBEngine.addPatient(testingData);
 
                     //do something else with each record
                     /*
