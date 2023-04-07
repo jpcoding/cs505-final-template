@@ -8,7 +8,7 @@ import json
 
 username = 'team_8'
 password = 'myPassCS505'
-hostname = ''  # @todo: figure this one out
+hostname = 'vbu231.cs.uky.edu'
 virtualhost = '8'
 
 credentials = pika.PlainCredentials(username, password)

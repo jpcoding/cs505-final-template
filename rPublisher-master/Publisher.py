@@ -8,32 +8,33 @@ def pub(virtualhost, message, exchange_name):
     # on the / virtual host using the username "guest" and password "guest"
     username = 'team_8'
     password = 'myPassCS505'
-    hostname = ''
+    hostname = 'vbu231.cs.uky.edu'
 
-    credentials = pika.PlainCredentials(username, password)
-    parameters = pika.ConnectionParameters(hostname,
-                                           5672,
-                                           virtualhost,
-                                           credentials)
 
-    connection = pika.BlockingConnection(parameters)
+credentials = pika.PlainCredentials(username, password)
+parameters = pika.ConnectionParameters(hostname,
+                                       5672,
+                                       virtualhost,
+                                       credentials)
 
-    channel = connection.channel()
+connection = pika.BlockingConnection(parameters)
 
-    exchange_name = 'patient_data'
+channel = connection.channel()
 
-    channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
+exchange_name = 'patient_data'
 
-    routing_key = 'patient.info'
+channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
 
-    channel.basic_publish(
-        exchange=exchange_name, routing_key=routing_key, body=message)
-    print(" [x] Sent %r:%r" % (routing_key, message))
+routing_key = 'patient.info'
 
-    connection.close()
+channel.basic_publish(
+    exchange=exchange_name, routing_key=routing_key, body=message)
+print(" [x] Sent %r:%r" % (routing_key, message))
 
-    def loadApps():
-        for dir in _execommon.APPSDIR.iterdir():
+ connection.close()
+
+  def loadApps():
+       for dir in _execommon.APPSDIR.iterdir():
             if not dir.is_dir():
                 continue
             dirName = dir.name
