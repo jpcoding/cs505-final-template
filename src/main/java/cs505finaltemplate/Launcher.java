@@ -29,9 +29,9 @@ public class Launcher {
 
         // **** start CEP init
 
-        cepEngine = new CEPEngine();
+//        cepEngine = new CEPEngine();
 
-        System.out.println("Starting CEP...");
+//        System.out.println("Starting CEP...");
 
         inputStreamName = "testInStream";
         String inputStreamAttributesString = "zip_code string";
@@ -56,22 +56,26 @@ public class Launcher {
                 + "select zip_code, count() as count " + "where patient_status == 1 " + // 1 is positive, 0 is negative
                 "group by zip_code " + "insert into testOutStream; ";
 
-        cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
-                outputStreamAttributesString, alertQueryString);
+//        cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
+//                outputStreamAttributesString, alertQueryString);
 
-        System.out.println("CEP Started...");
+
 
         // **** end CEP Init
 
         // start message collector
         Map<String, String> message_config = new HashMap<>();
         message_config.put("hostname", "vbu231.cs.uky.edu");
+        message_config.put("port","9099"); //
         message_config.put("username", "team_8");
         message_config.put("password", "myPassCS505");
         message_config.put("virtualhost", "8");
 
         topicConnector = new TopicConnector(message_config);
+
         topicConnector.connect();
+        System.out.println("Starting Web Server...");
+
         // end message collector
 
         // Embedded HTTP initialization
@@ -80,6 +84,7 @@ public class Launcher {
         try {
             while (true) {
                 Thread.sleep(5000);
+                System.out.println("sleeping...");
             }
         } catch (Exception ex) {
             ex.printStackTrace();

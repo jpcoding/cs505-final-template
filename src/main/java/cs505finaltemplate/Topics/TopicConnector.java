@@ -38,6 +38,7 @@ public class TopicConnector {
             // create connection factory, this can be used to create many connections
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost(config.get("hostname"));
+            factory.setPort(Integer.parseInt(config.get("port")));
             factory.setUsername(config.get("username"));
             factory.setPassword(config.get("password"));
             factory.setVirtualHost(config.get("virtualhost"));
@@ -86,7 +87,7 @@ public class TopicConnector {
                     // System.out.println("testInput: " + testInput);
 
                     // insert into CEP
-                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
+//                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
 
                     // Launcher.graphDBEngine.addPatient(testingData);
 
