@@ -21,7 +21,7 @@ connection = pika.BlockingConnection(parameters)
 
 channel = connection.channel()
 
-exchange_name = 'patient_data'
+exchange_name = 'patient_list'
 channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
 
 result = channel.queue_declare('', exclusive=True)
