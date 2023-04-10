@@ -21,6 +21,7 @@
         <maven.compiler.version>3.5.1</maven.compiler.version>
         <siddhi.version>5.1.18</siddhi.version>
         <orient.version>3.0.0</orient.version>
+        <
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
@@ -33,6 +34,18 @@
             <artifactId>orientdb-client</artifactId>
             <version>${orient.version}</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-core</artifactId>
+            <version>${orient.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-object</artifactId>
+            <version>${orient.version}</version>
 
         <dependency>
             <groupId>io.siddhi</groupId>

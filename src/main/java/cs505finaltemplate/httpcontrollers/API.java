@@ -91,7 +91,8 @@ public class API {
         String responseString = "{\"reset_status_code\": }";
         try {
 
-//            Launcher.graphDBEngine.resetDB();
+            Launcher.graphDBEngine.resetDB();
+
 
         } catch (Exception ex) {
 
