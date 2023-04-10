@@ -13,7 +13,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class Launcher {
 
     public static GraphDBEngine graphDBEngine;
@@ -26,11 +25,9 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
 
+        // graphDBEngine = new GraphDBEngine();
 
-        //startig DB/CEP init
-
-        //READ CLASS COMMENTS BEFORE USING
-        //graphDBEngine = new GraphDBEngine();
+        // **** start CEP init
 
         cepEngine = new CEPEngine();
 
@@ -42,45 +39,56 @@ public class Launcher {
         String outputStreamName = "testOutStream";
         String outputStreamAttributesString = "zip_code string, count long";
 
-        //This query must be modified.  Currently, it provides the last zip_code and total count
-        //You want counts per zip_code, to say another way "grouped by" zip_code
-        String queryString = " " +
-                "from testInStream#window.timeBatch(5 sec) " +
-                "select zip_code, count() as count " +
-                "insert into testOutStream; ";
+        // positive case counts per zip_code, grouped by zip_code
+        // @todo: still need to figure out how to compare two message batches.
+        // maybe do that in each channel? but then how do we keep track of alert zips
+        // and non-alert zips? Maybe an RDB with like one or two tables, if the zip is
+        // in the table then its in alert status. if the table has 5+ rows then the
+        // state is in alert status.
 
-        cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString, outputStreamAttributesString, queryString);
+        // table 1: zip_code int, alert_status boolean. initialize table with every zip
+        // in KY at alert_status False.
+        // you can use siddhi for the tables.
+
+        String tableQueryString = "define table zipAlerts ( zip_code int, alert_status bool )";
+
+        String alertQueryString = " " + "from " + inputStreamName + "#window.timeBatch(5 sec) "
+                + "select zip_code, count() as count " + "where patient_status == 1 " + // 1 is positive, 0 is negative
+                "group by zip_code " + "insert into testOutStream; ";
+
+        cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
+                outputStreamAttributesString, alertQueryString);
 
         System.out.println("CEP Started...");
-        //end DB/CEP Init
 
-        //start message collector
-        Map<String,String> message_config = new HashMap<>();
-        message_config.put("hostname",""); //Fill config for your team in
-        message_config.put("username","");
-        message_config.put("password","");
-        message_config.put("virtualhost","");
+        // **** end CEP Init
+
+        // start message collector
+        Map<String, String> message_config = new HashMap<>();
+        message_config.put("hostname", "vbu231.cs.uky.edu");
+        message_config.put("username", "team_8");
+        message_config.put("password", "myPassCS505");
+        message_config.put("virtualhost", "8");
 
         topicConnector = new TopicConnector(message_config);
         topicConnector.connect();
-        //end message collector
+        // end message collector
 
-        //Embedded HTTP initialization
+        // Embedded HTTP initialization
         startServer();
 
         try {
             while (true) {
                 Thread.sleep(5000);
             }
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     private static void startServer() throws IOException {
 
-        final ResourceConfig rc = new ResourceConfig()
-        .packages("cs505finaltemplate.httpcontrollers");
+        final ResourceConfig rc = new ResourceConfig().packages("cs505finaltemplate.httpcontrollers");
 
         System.out.println("Starting Web Server...");
         URI BASE_URI = UriBuilder.fromUri("http://0.0.0.0/").port(WEB_PORT).build();

@@ -48,7 +48,7 @@ public class CEPEngine {
 
     public void createCEP(String inputStreamName, String outputStreamName, String inputStreamAttributesString,
             String outputStreamAttributesString, String queryString) {
-
+        // @todo: define tables for alerts
         try {
 
             String inputTopic = UUID.randomUUID().toString();
@@ -127,7 +127,7 @@ public class CEPEngine {
 
     // @todo: do we need to clean a CEP db? it doesn't really store anything,
     // does it...?
-    public void cleadDB() {
+    public void cleanDB() {
         try {
             // clean cep database
             String query = "";

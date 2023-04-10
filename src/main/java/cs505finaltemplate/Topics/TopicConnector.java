@@ -14,18 +14,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class TopicConnector {
 
     private Gson gson;
 
-    final Type typeOfListMap = new TypeToken<List<Map<String,String>>>(){}.getType();
-    final Type typeListTestingData = new TypeToken<List<TestingData>>(){}.getType();
+    final Type typeOfListMap = new TypeToken<List<Map<String, String>>>() {
+    }.getType();
+    final Type typeListTestingData = new TypeToken<List<TestingData>>() {
+    }.getType();
 
-    //private String EXCHANGE_NAME = "patient_data";
-    Map<String,String> config;
+    // private String EXCHANGE_NAME = "patient_data";
+    Map<String, String> config;
 
-    public TopicConnector(Map<String,String> config) {
+    public TopicConnector(Map<String, String> config) {
         gson = new Gson();
         this.config = config;
     }
@@ -34,14 +35,14 @@ public class TopicConnector {
 
         try {
 
-            //create connection factory, this can be used to create many connections
+            // create connection factory, this can be used to create many connections
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost(config.get("hostname"));
             factory.setUsername(config.get("username"));
             factory.setPassword(config.get("password"));
             factory.setVirtualHost(config.get("virtualhost"));
 
-            //create a connection, many channels can be created from a single connection
+            // create a connection, many channels can be created from a single connection
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
 
@@ -53,7 +54,7 @@ public class TopicConnector {
             System.out.println("connect Error: " + ex.getMessage());
             ex.printStackTrace();
         }
-}
+    }
 
     private void patientListChannel(Channel channel) {
         try {
@@ -67,49 +68,45 @@ public class TopicConnector {
 
             channel.queueBind(queueName, topicName, "#");
 
-
             System.out.println(" [*] Paitent List Waiting for messages. To exit press CTRL+C");
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
                 String message = new String(delivery.getBody(), "UTF-8");
 
-
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
                 for (TestingData testingData : incomingList) {
-                    //Check if this data is perfect data first.
-
+                    // Check if this data is perfect data first.
 
                     // conditions to ignore imperfect data
-                    //Data to send to CEPEngine
+                    // Data to send to CEPEngine
                     Gson patient_info = new Gson();
                     String patient_info_jsonstring = patient_info.toJson(testingData);
-                    //uncomment for debug
-                    //System.out.println("testInput: " + testInput);
+                    // uncomment for debug
+                    // System.out.println("testInput: " + testInput);
 
-                    //insert into CEP
+                    // insert into CEP
                     Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
 
-//                    Launcher.graphDBEngine.addPatient(testingData);
+                    // Launcher.graphDBEngine.addPatient(testingData);
 
-                    //do something else with each record
+                    // do something else with each record
                     /*
-                    System.out.println("*Java Class*");
-                    System.out.println("\ttesting_id = " + testingData.testing_id);
-                    System.out.println("\tpatient_name = " + testingData.patient_name);
-                    System.out.println("\tpatient_mrn = " + testingData.patient_mrn);
-                    System.out.println("\tpatient_zipcode = " + testingData.patient_zipcode);
-                    System.out.println("\tpatient_status = " + testingData.patient_status);
-                    System.out.println("\tcontact_list = " + testingData.contact_list);
-                    System.out.println("\tevent_list = " + testingData.event_list);
+                     * System.out.println("*Java Class*"); System.out.println("\ttesting_id = " +
+                     * testingData.testing_id); System.out.println("\tpatient_name = " +
+                     * testingData.patient_name); System.out.println("\tpatient_mrn = " +
+                     * testingData.patient_mrn); System.out.println("\tpatient_zipcode = " +
+                     * testingData.patient_zipcode); System.out.println("\tpatient_status = " +
+                     * testingData.patient_status); System.out.println("\tcontact_list = " +
+                     * testingData.contact_list); System.out.println("\tevent_list = " +
+                     * testingData.event_list);
                      */
 
-                    // TODO 
+                    // TODO
                     // Data to send to orientDB
                     // Map<String,String> zip_entry = new HashMap<>();
                     // zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
 
-                    
                 }
 
             };
@@ -139,17 +136,17 @@ public class TopicConnector {
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
-                //new message
+                // new message
                 String message = new String(delivery.getBody(), "UTF-8");
 
-                //convert string to class
-                List<Map<String,String>> incomingList = gson.fromJson(message, typeOfListMap);
-                for (Map<String,String> hospitalData : incomingList) {
+                // convert string to class
+                List<Map<String, String>> incomingList = gson.fromJson(message, typeOfListMap);
+                for (Map<String, String> hospitalData : incomingList) {
                     int hospital_id = Integer.parseInt(hospitalData.get("hospital_id"));
                     String patient_name = hospitalData.get("patient_name");
                     String patient_mrn = hospitalData.get("patient_mrn");
                     int patient_status = Integer.parseInt(hospitalData.get("patient_status"));
-                    //do something with each each record.
+                    // do something with each each record.
                 }
 
             };
@@ -175,20 +172,19 @@ public class TopicConnector {
 
             channel.queueBind(queueName, topicName, "#");
 
-
             System.out.println(" [*] Vax List Waiting for messages. To exit press CTRL+C");
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
                 String message = new String(delivery.getBody(), "UTF-8");
 
-                //convert string to class
-                List<Map<String,String>> incomingList = gson.fromJson(message, typeOfListMap);
-                for (Map<String,String> vaxData : incomingList) {
+                // convert string to class
+                List<Map<String, String>> incomingList = gson.fromJson(message, typeOfListMap);
+                for (Map<String, String> vaxData : incomingList) {
                     int vaccination_id = Integer.parseInt(vaxData.get("vaccination_id"));
                     String patient_name = vaxData.get("patient_name");
                     String patient_mrn = vaxData.get("patient_mrn");
-                    //do something with each each record.
+                    // do something with each each record.
                 }
 
             };

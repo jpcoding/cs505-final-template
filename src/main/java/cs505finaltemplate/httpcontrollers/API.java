@@ -94,7 +94,6 @@ public class API {
 
             Launcher.graphDBEngine.resetDB();
 
-
         } catch (Exception ex) {
 
         }
