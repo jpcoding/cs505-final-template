@@ -42,7 +42,7 @@ public class TestGraph
 
         try {
             // Open the JSON file for reading
-            FileReader reader = new FileReader("/Users/pjiao/projects/cs505-final-template/rPublisher-master/patient_data.json");
+            FileReader reader = new FileReader("rPublisher-master/patient_data.json");
             // Use TypeToken to specify the type of the list
             // Deserialize the JSON data into a list of objects
             List<TestingData> data = gson.fromJson(reader, typeListTestingData);
@@ -66,7 +66,7 @@ public class TestGraph
         // add hospital data
         try {
             // Open the JSON file for reading
-            FileReader reader = new FileReader("/Users/pjiao/projects/cs505-final-template/rPublisher-master/hospital_data.json");
+            FileReader reader = new FileReader("rPublisher-master/hospital_data.json");
             List<HospitalData> data = gson.fromJson(reader, typeListHospitalData);
             reader.close();
             for (HospitalData testingData : data) {
@@ -79,7 +79,7 @@ public class TestGraph
 
         // add vax data
         try{
-            FileReader reader = new FileReader("/Users/pjiao/projects/cs505-final-template/rPublisher-master/vax_data.json");
+            FileReader reader = new FileReader("rPublisher-master/vax_data.json");
             List<VaxData> data = gson.fromJson(reader, typeListVaxData);
             reader.close();
             for (VaxData testingData : data) {
