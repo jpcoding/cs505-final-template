@@ -34,6 +34,19 @@
             <version>${orient.version}</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-core</artifactId>
+            <version>${orient.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-object</artifactId>
+            <version>${orient.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>io.siddhi</groupId>
             <artifactId>siddhi-core</artifactId>
@@ -143,6 +156,11 @@
                     <archive>
                         <manifest>
                             <mainClass>cs505finaltemplate.Launcher</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifest>
+                            <mainClass>cs505finaltemplate.TestGraph</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
