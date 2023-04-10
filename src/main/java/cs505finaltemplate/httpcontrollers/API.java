@@ -42,7 +42,7 @@ public class API {
             System.out.println("WHAT");
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
-            responseMap.put("Team_members_sids", "[12028230,12648912]");// @todo: put PuJiao's SID in response string
+            responseMap.put("Team_members_sids", "[12028230,12648912]");
             responseMap.put("app_status_code", "0");
 
             responseString = gson.toJson(responseMap);
@@ -83,6 +83,7 @@ public class API {
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
 
+    // Reset all DBs
     @GET
     @Path("/reset")
     @Produces(MediaType.APPLICATION_JSON)
@@ -91,7 +92,9 @@ public class API {
         String responseString = "{\"reset_status_code\": }";
         try {
 
-//            Launcher.graphDBEngine.resetDB();
+            // Launcher.graphDBEngine.resetDB();
+
+            // Launcher.cepEngine.cleanDB();
 
         } catch (Exception ex) {
 
