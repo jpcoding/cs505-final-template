@@ -24,15 +24,15 @@ n = text_file.write(vax_list)
 text_file.close()
 
 
-'''
+
 while True:
 
     patient_list, hospital_list, vax_list = getpayload(zip_map, 10)
 
-    for x in range(1,20):
+    for x in range(1,8):
         pub(str(x), patient_list, 'patient_list')
-        pub(str(x), hospital_list, 'hospital_list')
-        pub(str(x), patient_list, 'vax_list')
+        # pub(str(x), hospital_list, 'hospital_list')
+        # pub(str(x), patient_list, 'vax_list')
 
-    time.sleep(5)
-'''
+    time.sleep(15)
+

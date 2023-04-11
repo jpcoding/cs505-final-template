@@ -6,14 +6,14 @@ import json
 # Set the connection parameters to connect to rabbit-server1 on port 5672
 # on the / virtual host using the username "guest" and password "guest"
 
-username = 'team_8'
-password = 'myPassCS505'
-hostname = 'vbu231.cs.uky.edu'
-virtualhost = '8'
+username = 'guest'
+password = 'guest'
+hostname = 'localhost'
+virtualhost = '1'
 
 credentials = pika.PlainCredentials(username, password)
 parameters = pika.ConnectionParameters(hostname,
-                                       9099,
+                                       5672,
                                        virtualhost,
                                        credentials)
 

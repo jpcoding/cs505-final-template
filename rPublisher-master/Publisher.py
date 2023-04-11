@@ -6,35 +6,34 @@ def pub(virtualhost, message, exchange_name):
 
     # Set the connection parameters to connect to rabbit-server1 on port 5672
     # on the / virtual host using the username "guest" and password "guest"
-    username = 'team_8'
-    password = 'myPassCS505'
-    hostname = 'vbu231.cs.uky.edu'
+    username = 'guest'
+    password = 'guest'
+    hostname = 'localhost'
 
+    credentials = pika.PlainCredentials(username, password)
+    parameters = pika.ConnectionParameters(hostname,
+                                           5672,
+                                           virtualhost,
+                                           credentials)
 
-credentials = pika.PlainCredentials(username, password)
-parameters = pika.ConnectionParameters(hostname,
-                                       5672,
-                                       virtualhost,
-                                       credentials)
+    connection = pika.BlockingConnection(parameters)
 
-connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
 
-channel = connection.channel()
+    exchange_name = 'patient_list'
 
-exchange_name = 'patient_data'
+    channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
 
-channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
+    routing_key = 'patient_list'
 
-routing_key = 'patient.info'
+    channel.basic_publish(
+         exchange=exchange_name, routing_key=routing_key, body=message)
+    print(" [x] Sent %r:%r" % (routing_key, message))
 
-channel.basic_publish(
-    exchange=exchange_name, routing_key=routing_key, body=message)
-print(" [x] Sent %r:%r" % (routing_key, message))
+    connection.close()
 
- connection.close()
-
-  def loadApps():
-       for dir in _execommon.APPSDIR.iterdir():
+    def loadApps():
+        for dir in _execommon.APPSDIR.iterdir():
             if not dir.is_dir():
                 continue
             dirName = dir.name
@@ -43,8 +42,7 @@ print(" [x] Sent %r:%r" % (routing_key, message))
             try:
                 module = importlib.import_module(moduleName)
             except ImportError:
-                logging.exception(
-                    f'Error while trying to import app "{moduleName}":')
+                logging.exception(f'Error while trying to import app "{moduleName}":')
                 continue
             if dirName == 'sys':
                 flaskconst.flaskapp.APP.register_blueprint(module.c.BLUEPRINT)
@@ -58,18 +56,14 @@ print(" [x] Sent %r:%r" % (routing_key, message))
         appSys = flaskconst.APPS['sys']
         sysDbVer = appSys.c.DBVLATEST.V.versionStats()[0]
 
-        # Only do entity sync if the database is ready for it.
-        if sysDbVer is not None and sysDbVer >= 13:
-            entities = {entityType: set()
-                        for entityType in appSys.c.ENTITYTYPE}
+        if sysDbVer is not None and sysDbVer >= 13:  # Only do entity sync if the database is ready for it.
+            entities = {entityType: set() for entityType in appSys.c.ENTITYTYPE}
             for app in flaskconst.APPS.values():
                 for entityType in appSys.c.ENTITYTYPE:
-                    entities[entityType].update(
-                        app.c.ENTITIES.get(entityType, {}))
+                    entities[entityType].update(app.c.ENTITIES.get(entityType, {}))
             appSys.db.accessEntitiesSet(entities)
 
-        # Only do admin account creation if the database is ready for it.
-        if sysDbVer is not None and sysDbVer >= 14:
+        if sysDbVer is not None and sysDbVer >= 14:  # Only do admin account creation if the database is ready for it.
             try:
                 appSys.db.accountGetByUsername(appSys.c.ACCOUNTUSERNAMESTARTER)
             except KeyError:
@@ -79,9 +73,7 @@ print(" [x] Sent %r:%r" % (routing_key, message))
                     'Me',
                     'Delete This Account',
                     security.LOGINMETHODS.BASIC,
-                    # Change this arg to a strong `str` password.  Intentionally `None` to throw exception.
-                    None,
+                    None,  # Change this arg to a strong `str` password.  Intentionally `None` to throw exception.
                     _BYPASSAUTHORIZATION=True,
                 )
-        logging.info(
-            f'App loading complete.  Current list is: {flaskconst.APPS!r}')
+        logging.info(f'App loading complete.  Current list is: {flaskconst.APPS!r}')

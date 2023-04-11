@@ -35,7 +35,7 @@ public class GraphDBEngine {
         this.dbName = dbName;
 
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
-//        resetDB(orient, dbName);
+        resetDB(orient, dbName);
         db = orient.open(dbName, "root", "rootpwd");
         // create schema
         // patient node and edge
@@ -104,6 +104,7 @@ public class GraphDBEngine {
     public void resetDB() {
         resetDB(orient, dbName);
     }
+
     public void closeBD(){
         db.close();
         orient.close();
@@ -127,6 +128,7 @@ public class GraphDBEngine {
         // If the node already exists, update it
         // If the node does not exist, create it
         // If the node has a contact, create an edge between the two nodes
+        db = orient.open(dbName, "root", "rootpwd");
 
         String query = "SELECT FROM patient WHERE patient_mrn = ?" ;
 //        OResultSet rs;

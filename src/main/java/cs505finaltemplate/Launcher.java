@@ -33,11 +33,11 @@ public class Launcher {
 
 //        System.out.println("Starting CEP...");
 
-        inputStreamName = "testInStream";
-        String inputStreamAttributesString = "zip_code string";
-
-        String outputStreamName = "testOutStream";
-        String outputStreamAttributesString = "zip_code string, count long";
+//        inputStreamName = "testInStream";
+//        String inputStreamAttributesString = "zip_code string";
+//
+//        String outputStreamName = "testOutStream";
+//        String outputStreamAttributesString = "zip_code string, count long";
 
         // positive case counts per zip_code, grouped by zip_code
         // @todo: still need to figure out how to compare two message batches.
@@ -66,15 +66,18 @@ public class Launcher {
         // start message collector
         Map<String, String> message_config = new HashMap<>();
         message_config.put("hostname", "vbu231.cs.uky.edu");
+//        message_config.put("hostname", "localhost");
         message_config.put("port","9099"); //
         message_config.put("username", "team_8");
         message_config.put("password", "myPassCS505");
         message_config.put("virtualhost", "8");
-
+//        message_config.put("username", "guest");
+//        message_config.put("password", "guest");
+//        message_config.put("virtualhost", "1");
         topicConnector = new TopicConnector(message_config);
 
         topicConnector.connect();
-        System.out.println("Starting Web Server...");
+        System.out.println("Starting Web Server json...");
 
 
 
