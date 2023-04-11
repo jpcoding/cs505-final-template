@@ -6,14 +6,14 @@ import json
 # Set the connection parameters to connect to rabbit-server1 on port 5672
 # on the / virtual host using the username "guest" and password "guest"
 
-username = 'guest'
-password = 'guest'
-hostname = 'localhost'
-virtualhost = '1'
+username = 'team_8'
+password = 'myPassCS505'
+hostname = 'vbu231.cs.uky.edu'
+virtualhost = '8'
 
 credentials = pika.PlainCredentials(username, password)
 parameters = pika.ConnectionParameters(hostname,
-                                       5672,
+                                       9099,
                                        virtualhost,
                                        credentials)
 
@@ -43,16 +43,16 @@ print(' [*] Waiting for logs. To exit press CTRL+C')
 def callback(ch, method, properties, body):
     print(" [x] %r:%r" % (method.routing_key, body))
 
-    testing_data = json.loads(body)
-    for test in testing_data:
-        print("*Python Class*")
-        print("\ttesting_id: " + str(test['testing_id']))
-        print("\tpatient_name: " + str(test['patient_name']))
-        print("\tpatient_mrn: " + str(test['patient_mrn']))
-        print("\tpatient_zipcode: " + str(test['patient_zipcode']))
-        print("\tpatient_status: " + str(test['patient_status']))
-        print("\tcontact_list: " + str(test['contact_list']))
-        print("\tevent_list: " + str(test['event_list']))
+    # testing_data = json.loads(body)
+    # for test in testing_data:
+    #     print("*Python Class*")
+    #     print("\ttesting_id: " + str(test['testing_id']))
+    #     print("\tpatient_name: " + str(test['patient_name']))
+    #     print("\tpatient_mrn: " + str(test['patient_mrn']))
+    #     print("\tpatient_zipcode: " + str(test['patient_zipcode']))
+    #     print("\tpatient_status: " + str(test['patient_status']))
+    #     print("\tcontact_list: " + str(test['contact_list']))
+    #     print("\tevent_list: " + str(test['event_list']))
 
 
 channel.basic_consume(
