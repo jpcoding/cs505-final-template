@@ -29,9 +29,9 @@ public class Launcher {
 
         // **** start CEP init
 
-//        cepEngine = new CEPEngine();
+        cepEngine = new CEPEngine();
 
-//        System.out.println("Starting CEP...");
+        System.out.println("Starting CEP...");
 
         inputStreamName = "testInStream";
         String inputStreamAttributesString = "zip_code string";
@@ -49,24 +49,20 @@ public class Launcher {
         // table 1: zip_code int, alert_status boolean. initialize table with every zip
         // in KY at alert_status False.
         // you can use siddhi for the tables.
-
-        String tableQueryString = "define table zipAlerts ( zip_code int, alert_status bool )";
-
-        String alertQueryString = " " + "from " + inputStreamName + "#window.timeBatch(5 sec) "
-                + "select zip_code, count() as count " + "where patient_status == 1 " + // 1 is positive, 0 is negative
+        System.out.println("boi\n");
+        String alertQueryString = "from " + inputStreamName + "#window.timeBatch(5 sec) "
+                + "select zip_code, count() as count " + "having patient_status == 1 " + // 1 is positive, 0 is negative
                 "group by zip_code " + "insert into testOutStream; ";
 
-//        cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
-//                outputStreamAttributesString, alertQueryString);
-
-
+        cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
+                outputStreamAttributesString, alertQueryString);
 
         // **** end CEP Init
 
         // start message collector
         Map<String, String> message_config = new HashMap<>();
         message_config.put("hostname", "vbu231.cs.uky.edu");
-        message_config.put("port","9099"); //
+        message_config.put("port", "9099"); //
         message_config.put("username", "team_8");
         message_config.put("password", "myPassCS505");
         message_config.put("virtualhost", "8");

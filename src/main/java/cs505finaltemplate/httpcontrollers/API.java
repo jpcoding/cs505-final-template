@@ -89,7 +89,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response reset(@HeaderParam("X-Auth-API-Key") String authKey) {
         // @todo: status code 0 means fail, 1 means success. make that work.
-        String responseString = "{\"reset_status_code\": }";
+        String responseString = "{}";
         try {
 
             Launcher.graphDBEngine.resetDB();
@@ -107,7 +107,7 @@ public class API {
     public Response getZipAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
         // @todo: implement
         // We define alert state as a growth of 2X over two batches of messages.
-        String responseString = "{\"ziplist\": }";
+        String responseString = "{}";
         try {
 
         } catch (Exception ex) {
@@ -123,7 +123,7 @@ public class API {
         // @todo: implement - state_status = 0 = not alert, 1 = alert
         // alert on statewide when at least five zipcodes are in alert state
         // (based on RT1) within the same 15 second window.
-        String responseString = "{\"state_status\": }";
+        String responseString = "{}";
         try {
 
         } catch (Exception ex) {
@@ -138,7 +138,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConfirmedContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
         // @todo: implement
-        String responseString = "{\"ziplist\": }";
+        String responseString = "{}";
         try {
 
         } catch (Exception ex) {
@@ -152,7 +152,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPossibleContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
         // @todo: implement
-        String responseString = "{\"\": }";
+        String responseString = "{}";
         try {
 
         } catch (Exception ex) {
@@ -166,7 +166,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPatientStatus(@HeaderParam("X-Auth-API-Key") String authKey) {
         // @todo: implement
-        String responseString = "{\"\": }";
+        String responseString = "{}";
         try {
 
         } catch (Exception ex) {

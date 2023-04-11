@@ -87,7 +87,7 @@ public class TopicConnector {
                     // System.out.println("testInput: " + testInput);
 
                     // insert into CEP
-//                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
+                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
 
                     // Launcher.graphDBEngine.addPatient(testingData);
 

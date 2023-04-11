@@ -5,6 +5,7 @@ import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.stream.output.sink.InMemorySink;
 import io.siddhi.core.util.transport.InMemoryBroker;
+import io.siddhi.query.api.definition.TableDefinition;
 
 import java.util.Map;
 import java.util.UUID;
@@ -15,6 +16,13 @@ public class CEPEngine {
     private SiddhiManager siddhiManager;
     private SiddhiAppRuntime siddhiAppRuntime;
     private Map<String, String> topicMap;
+
+    // table definition queries
+    private String zipAlertTable = "zipAlerts";
+    private String lastAlertTable = "lastAlert";
+    private String zipAlertQueryString = "@PrimaryKey('zip_code') " + "define table " + zipAlertTable
+            + " (zip_code int, alert_status bool)";
+    private String lastMessageTableQueryString = "define table " + lastAlertTable + " (zip_code int, count int)";
 
     private Gson gson;
 
@@ -48,7 +56,6 @@ public class CEPEngine {
 
     public void createCEP(String inputStreamName, String outputStreamName, String inputStreamAttributesString,
             String outputStreamAttributesString, String queryString) {
-        // @todo: define tables for alerts
         try {
 
             String inputTopic = UUID.randomUUID().toString();
@@ -74,6 +81,8 @@ public class CEPEngine {
             // Starting event processing
             siddhiAppRuntime.start();
 
+            initializeTables();
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -94,6 +103,37 @@ public class CEPEngine {
 
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public void cleanDB() {
+        try {
+            // clean cep database
+            String query = "delete from " + zipAlertTable;
+            siddhiAppRuntime.query(query);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void getZipAlerts() {
+
+    }
+
+    public void getStateAlert() {
+
+    }
+
+    // create tables for the cep to remember stuff
+    private void initializeTables() {
+        siddhiAppRuntime.query(zipAlertQueryString);
+        siddhiAppRuntime.query(lastMessageTableQueryString);
+        // @todo: get rid of debug lines
+        System.out.println("table definition:\n");
+        Map<String, TableDefinition> tableDef = siddhiAppRuntime.getTableDefinitionMap();
+        for (Map.Entry<String, TableDefinition> entry : tableDef.entrySet()) {
+            System.out.println("\t" + entry.getKey() + ": " + entry.getValue() + "\n");
         }
     }
 
@@ -123,18 +163,6 @@ public class CEPEngine {
         }
 
         return sinkString;
-    }
-
-    // @todo: do we need to clean a CEP db? it doesn't really store anything,
-    // does it...?
-    public void cleanDB() {
-        try {
-            // clean cep database
-            String query = "";
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
 }
