@@ -126,7 +126,7 @@ public class CEPEngine {
     // create tables for the cep to remember stuff
     private void initializeTables() {
 
-        siddhiAppRuntime.query(zipAlertQueryString);
+//        siddhiAppRuntime.query(zipAlertQueryString);
 
         // @todo: get rid of debug lines
         System.out.println("table definition:\n");

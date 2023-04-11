@@ -25,8 +25,7 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
 
-        graphDBEngine = new GraphDBEngine("test");
-
+//        graphDBEngine = new GraphDBEngine("test");
         // **** start CEP init
 
         cepEngine = new CEPEngine();
@@ -34,17 +33,33 @@ public class Launcher {
         System.out.println("Starting CEP...");
 
         inputStreamName = "testInStream";
-        String inputStreamAttributesString = "zip_code string";
+        String inputStreamAttributesString = "zip_code string, patient_status string";
 
         String outputStreamName = "testOutStream";
-        String outputStreamAttributesString = "zip_code string, count long";
+        String outputStreamAttributesString = "zip_code string, patient_status string, count long";
 
         // @todo: still need to figure out how to compare two message batches.
         // positive case counts per zip_code, grouped by zip_code
         System.out.println("boi\n");
         String alertQueryString = "from " + inputStreamName + "#window.timeBatch(5 sec) "
-                + "select zip_code, count() as count " + "having patient_status == 1 " + // 1 is positive, 0 is negative
-                "group by zip_code " + "insert into testOutStream; ";
+                + "select zip_code, count() as count "+
+                "group by zip_code " +
+                "having patient_status == 1 " + // 1 is positive, 0 is negative
+                "insert into testOutStream; ";
+
+        alertQueryString = "from testInStream#window.timeBatch(5 sec) " +
+                "select zip_code, patient_status, count() as count " +
+                "group by zip_code " +
+                "having patient_status == \"1\" " +
+                "insert into testOutStream;";
+
+        System.out.println(alertQueryString);
+
+//        String alertQueryString = " " +
+//                "from testInStream#window.timeBatch(5 sec) " +
+//                "select zip_code, count() as count " +
+//                "insert into testOutStream; ";
+
 
         cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
                 outputStreamAttributesString, alertQueryString);

@@ -75,8 +75,8 @@ public class TopicConnector {
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
                 String message = new String(delivery.getBody(), "UTF-8");
-                System.out.println(" [x] Received Patient List Batch'" +
-                        delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
+//                System.out.println(" [x] Received Patient List Batch'" +
+//                        delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
 
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
 //                Gson patient_info = new Gson();
@@ -89,13 +89,23 @@ public class TopicConnector {
                     // Check if this data is perfect data first.
                     Gson patient_info = new Gson();
                     String patient_info_jsonstring = patient_info.toJson(testingData);
-                    System.out.println(patient_info_jsonstring);
-                    try {
-                        System.out.println(patient_info_jsonstring);
-                        Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    System.out.println(patient_info_jsonstring);
+//                    try {
+//                        System.out.println(patient_info_jsonstring);
+//                        Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+                    Map<String,String> zip_entry = new HashMap<>();
+                    zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
+                    Map<String, String> patient_status_entry = new HashMap<>();
+                    patient_status_entry.put("patient_status", testingData.patient_status);
+                    Map<String, Object> combinedMap = new HashMap<>();
+                    combinedMap.putAll(zip_entry);
+                    combinedMap.putAll(patient_status_entry);
+                    Gson gson = new Gson();
+                    String testInput = gson.toJson(combinedMap);
+                    Launcher.cepEngine.input("testInStream",testInput);
 
 //
 
@@ -108,7 +118,7 @@ public class TopicConnector {
                     // System.out.println("testInput: " + testInput);
 
                     // insert into CEP
-                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
+//                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
 
                     // Launcher.graphDBEngine.addPatient(testingData);
 
