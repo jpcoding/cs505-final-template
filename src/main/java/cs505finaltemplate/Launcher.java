@@ -25,7 +25,7 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
 
-        // graphDBEngine = new GraphDBEngine();
+        graphDBEngine = new GraphDBEngine("test");
 
         // **** start CEP init
 
@@ -75,6 +75,8 @@ public class Launcher {
 
         topicConnector.connect();
         System.out.println("Starting Web Server...");
+
+
 
         // end message collector
 

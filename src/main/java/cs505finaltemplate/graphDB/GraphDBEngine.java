@@ -18,6 +18,9 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.db.ODatabaseType;
+import java.util.List;
+import com.google.gson.Gson;
+
 
 
 
@@ -32,7 +35,7 @@ public class GraphDBEngine {
         this.dbName = dbName;
 
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
-        resetDB(orient, dbName);
+//        resetDB(orient, dbName);
         db = orient.open(dbName, "root", "rootpwd");
         // create schema
         // patient node and edge
@@ -120,12 +123,29 @@ public class GraphDBEngine {
         return result;
     }
 
-    public void addPatient(TestingData patient) {
+    private void addPatient(TestingData patient) {
         // If the node already exists, update it
         // If the node does not exist, create it
         // If the node has a contact, create an edge between the two nodes
-        String query = "SELECT FROM patient WHERE patient_mrn = ?";
+
+        String query = "SELECT FROM patient WHERE patient_mrn = ?" ;
+//        OResultSet rs;
+//        rs = null;
+//        try{
+//            System.out.println("1234: ");
+//            rs = db.command(query, "1def220e-b4e8-11ec-a016-ac87a3187c5f");
+//            System.out.println("patient_mrn: " + patient.patient_mrn);
+//        }
+//        catch (Exception ex)
+//        {System.out.println("exception: ");
+//            ex.printStackTrace();
+//        }
         OResultSet rs = db.query(query, patient.patient_mrn);
+
+        if (!rs.hasNext()) {
+            System.out.println("rs is null");
+        }
+
         if (rs.hasNext()) {
             OResult item = rs.next();
             if (item.isVertex()) {
@@ -178,8 +198,8 @@ public class GraphDBEngine {
 //                    rs.close();
                 }
             }
-            rs.close();
         } else {
+            System.out.println("Creating new patient");
             OVertex result = db.newVertex("patient");
             result.setProperty("testing_id", patient.testing_id);
             result.setProperty("patient_mrn", patient.patient_mrn);
@@ -205,10 +225,34 @@ public class GraphDBEngine {
                     OEdge edge = result.addEdge(newContact, "contact_with");
                     edge.save();
                 }
-                rs.close();
-            }
-        }
 
+            }
+
+        }
+        rs.close();
+    }
+
+    public void addPatient(String testing_id, String patient_mrn, String patient_name, int patient_status,
+                           int patient_zipcode, List<String> contact_list, List<String> event_list) {
+        TestingData patient = new TestingData(testing_id, patient_mrn, patient_name, patient_status, patient_zipcode, contact_list, event_list);
+        addPatient(patient);
+    }
+
+    public void addPatient(String jsonString)
+    {
+        Gson gson = new Gson();
+        System.out.println("jsonString: " + jsonString);
+        TestingData patient = gson.fromJson(jsonString, TestingData.class);
+//        System.out.println("testing_id: " + patient.testing_id);
+//        System.out.println("patient_name: " + patient.patient_name);
+//        System.out.println("patient_mrn: " + patient.patient_mrn);
+//        System.out.println("patient_zipcode: " + patient.patient_zipcode);
+//        System.out.println("patient_status: " + patient.patient_status);
+        addPatient(patient);
+    }
+
+    public void printString(String s){
+        System.out.println(s);
     }
 
     public void addHospital(HospitalData hospital) {

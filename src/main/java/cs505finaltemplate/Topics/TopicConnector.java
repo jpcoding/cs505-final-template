@@ -7,6 +7,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 import cs505finaltemplate.Launcher;
+import cs505finaltemplate.graphDB.GraphDBEngine;
 import io.siddhi.query.api.expression.condition.In;
 
 import java.lang.reflect.Type;
@@ -48,8 +49,8 @@ public class TopicConnector {
             Channel channel = connection.createChannel();
 
             patientListChannel(channel);
-            hospitalListChannel(channel);
-            vaxListChannel(channel);
+//            hospitalListChannel(channel);
+//            vaxListChannel(channel);
 
         } catch (Exception ex) {
             System.out.println("connect Error: " + ex.getMessage());
@@ -78,11 +79,17 @@ public class TopicConnector {
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
                 for (TestingData testingData : incomingList) {
                     // Check if this data is perfect data first.
+                    Gson patient_info = new Gson();
+                    String patient_info_jsonstring = patient_info.toJson(testingData);
+
+                    Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+//
 
                     // conditions to ignore imperfect data
                     // Data to send to CEPEngine
-                    Gson patient_info = new Gson();
-                    String patient_info_jsonstring = patient_info.toJson(testingData);
+
+//                    Launcher.graphDBEngine.addPatient(testingData);
+//                    System.out.println(patient_info_jsonstring);
                     // uncomment for debug
                     // System.out.println("testInput: " + testInput);
 
@@ -93,7 +100,8 @@ public class TopicConnector {
 
                     // do something else with each record
                     /*
-                     * System.out.println("*Java Class*"); System.out.println("\ttesting_id = " +
+                     * System.out.println("*Java Class*");
+                     * System.out.println("\ttesting_id = " +
                      * testingData.testing_id); System.out.println("\tpatient_name = " +
                      * testingData.patient_name); System.out.println("\tpatient_mrn = " +
                      * testingData.patient_mrn); System.out.println("\tpatient_zipcode = " +

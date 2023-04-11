@@ -159,11 +159,6 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
-                        <manifest>
-                            <mainClass>cs505finaltemplate.TestGraph</mainClass>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
                         <manifestEntries>
                             <artifactId>blah</artifactId>
                             <Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>

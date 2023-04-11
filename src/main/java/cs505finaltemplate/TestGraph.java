@@ -52,7 +52,9 @@ public class TestGraph
             for (TestingData testingData : data) {
 //                System.out.println(testingData.patient_name);
 //                System.out.println(testingData.patient_mrn);
-                graphDBEngine.addPatient(testingData);
+                Gson patient_info = new Gson();
+                String patient_info_jsonstring = patient_info.toJson(testingData);
+                graphDBEngine.addPatient(patient_info_jsonstring);
             }
 
         } catch (IOException e) {
@@ -89,7 +91,7 @@ public class TestGraph
         } catch (IOException e) {
             e.printStackTrace();
         }
-        graphDBEngine.cleadData();
+//        graphDBEngine.cleadData();
 
         graphDBEngine.closeBD();
 //
