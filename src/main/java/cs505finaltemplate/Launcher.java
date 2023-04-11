@@ -25,7 +25,7 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
 
-        // graphDBEngine = new GraphDBEngine();
+        graphDBEngine = new GraphDBEngine("test");
 
         // **** start CEP init
 
@@ -66,11 +66,13 @@ public class Launcher {
         message_config.put("username", "team_8");
         message_config.put("password", "myPassCS505");
         message_config.put("virtualhost", "8");
-
+        // message_config.put("username", "guest");
+        // message_config.put("password", "guest");
+        // message_config.put("virtualhost", "1");
         topicConnector = new TopicConnector(message_config);
 
         topicConnector.connect();
-        System.out.println("Starting Web Server...");
+        System.out.println("Starting Web Server json...");
 
         // end message collector
 
@@ -80,7 +82,6 @@ public class Launcher {
         try {
             while (true) {
                 Thread.sleep(5000);
-                System.out.println("sleeping...");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
