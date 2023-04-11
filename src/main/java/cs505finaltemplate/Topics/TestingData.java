@@ -4,15 +4,15 @@ import java.util.List;
 
 public class TestingData {
 
-    public String testing_id;
+    public int testing_id;
     public String patient_name;
     public String patient_mrn;
-    public int patient_zipcode;
-    public int patient_status;
+    public String patient_zipcode;
+    public String patient_status;
     public List<String> contact_list;
     public List<String> event_list;
 
-    public  TestingData( String testing_id, String patient_name, String patient_mrn, int patient_zipcode, int patient_status, List<String> contact_list, List<String> event_list) {
+    public  TestingData( int testing_id, String patient_name, String patient_mrn, String patient_zipcode, String patient_status, List<String> contact_list, List<String> event_list) {
         //default constructor
         this.testing_id = testing_id;
         this.patient_name = patient_name;

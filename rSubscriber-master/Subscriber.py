@@ -13,7 +13,7 @@ virtualhost = '8'
 
 credentials = pika.PlainCredentials(username, password)
 parameters = pika.ConnectionParameters(hostname,
-                                       5672,
+                                       9099,
                                        virtualhost,
                                        credentials)
 

@@ -198,7 +198,9 @@ public class GraphDBEngine {
 //                    rs.close();
                 }
             }
-        } else {
+        }
+        else
+        {
             System.out.println("Creating new patient");
             OVertex result = db.newVertex("patient");
             result.setProperty("testing_id", patient.testing_id);
@@ -232,8 +234,7 @@ public class GraphDBEngine {
         rs.close();
     }
 
-    public void addPatient(String testing_id, String patient_mrn, String patient_name, int patient_status,
-                           int patient_zipcode, List<String> contact_list, List<String> event_list) {
+    public void addPatient(int testing_id, String patient_name, String patient_mrn, String patient_zipcode, String patient_status, List<String> contact_list, List<String> event_list) {
         TestingData patient = new TestingData(testing_id, patient_mrn, patient_name, patient_status, patient_zipcode, contact_list, event_list);
         addPatient(patient);
     }

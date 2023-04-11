@@ -75,14 +75,26 @@ public class TopicConnector {
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
                 String message = new String(delivery.getBody(), "UTF-8");
+                System.out.println(" [x] Received Patient List Batch'" +
+                        delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
 
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
-                for (TestingData testingData : incomingList) {
-                    // Check if this data is perfect data first.
-                    Gson patient_info = new Gson();
-                    String patient_info_jsonstring = patient_info.toJson(testingData);
+                Gson patient_info = new Gson();
+                String patient_info_jsonstring = patient_info.toJson(incomingList.get(0));
 
-                    Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+                Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+
+                for (TestingData testingData : incomingList) {
+
+                    // Check if this data is perfect data first.
+//                    Gson patient_info = new Gson();
+//                    String patient_info_jsonstring = patient_info.toJson(testingData);
+//                    try {
+//                        Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+//                    } catch (Exception e) {
+//                        System.out.println("Error: " + e.getMessage());
+//                    }
+
 //
 
                     // conditions to ignore imperfect data
