@@ -48,13 +48,7 @@ public class API {
             responseString = gson.toJson(responseMap);
 
         } catch (Exception ex) {
-
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-            ex.printStackTrace();
-
-            return Response.status(500).entity(exceptionAsString).build();
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
@@ -72,13 +66,7 @@ public class API {
             responseString = gson.toJson(responseMap);
 
         } catch (Exception ex) {
-
-            StringWriter sw = new StringWriter();
-            ex.printStackTrace(new PrintWriter(sw));
-            String exceptionAsString = sw.toString();
-            ex.printStackTrace();
-
-            return Response.status(500).entity(exceptionAsString).build();
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
@@ -93,9 +81,10 @@ public class API {
         try {
 
             Launcher.graphDBEngine.resetDB();
+            Launcher.cepEngine.cleanDB();
 
         } catch (Exception ex) {
-
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
@@ -111,7 +100,7 @@ public class API {
         try {
 
         } catch (Exception ex) {
-
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
@@ -127,7 +116,7 @@ public class API {
         try {
 
         } catch (Exception ex) {
-
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
@@ -142,7 +131,7 @@ public class API {
         try {
 
         } catch (Exception ex) {
-
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
@@ -156,7 +145,7 @@ public class API {
         try {
 
         } catch (Exception ex) {
-
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
@@ -170,8 +159,18 @@ public class API {
         try {
 
         } catch (Exception ex) {
-
+            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    private Response printException(Exception ex) {
+
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        String exceptionAsString = sw.toString();
+        ex.printStackTrace();
+
+        return Response.status(500).entity(exceptionAsString).build();
     }
 }
