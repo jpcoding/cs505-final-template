@@ -39,7 +39,7 @@ public class API {
     public Response getTeam() {
         String responseString = "{}";
         try {
-            System.out.println("WHAT");
+            System.out.println("WHAT");// @todo: remove debug line
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
             responseMap.put("Team_members_sids", "[12028230,12648912]");
@@ -82,6 +82,9 @@ public class API {
 
             Launcher.graphDBEngine.resetDB();
             Launcher.cepEngine.cleanDB();
+            Map<String, String> responseMap = new HashMap<>();
+            responseMap.put("status_code", "1");
+            responseString = gson.toJson(responseMap);
 
         } catch (Exception ex) {
             return printException(ex);

@@ -19,10 +19,8 @@ public class CEPEngine {
 
     // table definition queries
     private String zipAlertTable = "zipAlerts";
-    private String lastAlertTable = "lastAlert";
     private String zipAlertQueryString = "@PrimaryKey('zip_code') " + "define table " + zipAlertTable
             + " (zip_code int, alert_status bool)";
-    private String lastMessageTableQueryString = "define table " + lastAlertTable + " (zip_code int, count int)";
 
     private Gson gson;
 
@@ -109,7 +107,7 @@ public class CEPEngine {
     public void cleanDB() {
         try {
             // clean cep database
-            String query = "delete from " + zipAlertTable;
+            String query = "delete " + zipAlertTable + ";";
             siddhiAppRuntime.query(query);
 
         } catch (Exception ex) {
@@ -127,8 +125,9 @@ public class CEPEngine {
 
     // create tables for the cep to remember stuff
     private void initializeTables() {
+
         siddhiAppRuntime.query(zipAlertQueryString);
-        siddhiAppRuntime.query(lastMessageTableQueryString);
+
         // @todo: get rid of debug lines
         System.out.println("table definition:\n");
         Map<String, TableDefinition> tableDef = siddhiAppRuntime.getTableDefinitionMap();

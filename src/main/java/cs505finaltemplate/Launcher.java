@@ -39,16 +39,8 @@ public class Launcher {
         String outputStreamName = "testOutStream";
         String outputStreamAttributesString = "zip_code string, count long";
 
-        // positive case counts per zip_code, grouped by zip_code
         // @todo: still need to figure out how to compare two message batches.
-        // maybe do that in each channel? but then how do we keep track of alert zips
-        // and non-alert zips? Maybe an RDB with like one or two tables, if the zip is
-        // in the table then its in alert status. if the table has 5+ rows then the
-        // state is in alert status.
-
-        // table 1: zip_code int, alert_status boolean. initialize table with every zip
-        // in KY at alert_status False.
-        // you can use siddhi for the tables.
+        // positive case counts per zip_code, grouped by zip_code
         System.out.println("boi\n");
         String alertQueryString = "from " + inputStreamName + "#window.timeBatch(5 sec) "
                 + "select zip_code, count() as count " + "having patient_status == 1 " + // 1 is positive, 0 is negative
