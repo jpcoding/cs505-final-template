@@ -142,7 +142,7 @@ public class API {
     @GET
     @Path("/getpossiblecontacts")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPossibleContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getPossibleContacts() {
         // @todo: implement
         String responseString = "{}";
         try {
@@ -156,7 +156,7 @@ public class API {
     @GET
     @Path("/getpatientstatus")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPatientStatus(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getPatientStatus() {
         // @todo: implement
         String responseString = "{}";
         try {
