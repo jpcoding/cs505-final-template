@@ -43,7 +43,7 @@ public class API {
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
             responseMap.put("Team_members_sids", "[12028230,12648912]");
-            responseMap.put("app_status_code", "0");
+            responseMap.put("app_status_code", "1");
 
             responseString = gson.toJson(responseMap);
 
@@ -56,7 +56,7 @@ public class API {
     @GET
     @Path("/getlastcep")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAccessCount(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getAccessCount() {
         String responseString = "{}";
         try {
 
@@ -75,7 +75,7 @@ public class API {
     @GET
     @Path("/reset")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response reset(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response reset() {
         // @todo: status code 0 means fail, 1 means success. make that work.
         String responseString = "{}";
         try {
@@ -96,7 +96,7 @@ public class API {
     @GET
     @Path("/zipalertlist")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getZipAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getZipAlertList() {
         // @todo: implement
         // We define alert state as a growth of 2X over two batches of messages.
         String responseString = "{}";
@@ -111,7 +111,7 @@ public class API {
     @GET
     @Path("/alertlist")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getAlertList() {
         // @todo: implement - state_status = 0 = not alert, 1 = alert
         // alert on statewide when at least five zipcodes are in alert state
         // (based on RT1) within the same 15 second window.
@@ -126,9 +126,9 @@ public class API {
 
     // graph API functions
     @GET
-    @Path("/getconfirmedcontacts")
+    @Path("/getconfirmedcontacts/{patient_mrn}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getConfirmedContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getConfirmedContacts(@HeaderParam("patient_mrn") String patient_mrn) {
         // @todo: implement
         String responseString = "{}";
         try {

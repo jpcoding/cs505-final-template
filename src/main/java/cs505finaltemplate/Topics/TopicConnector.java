@@ -90,12 +90,12 @@ public class TopicConnector {
                     Gson patient_info = new Gson();
                     String patient_info_jsonstring = patient_info.toJson(testingData);
 //                    System.out.println(patient_info_jsonstring);
-//                    try {
-//                        System.out.println(patient_info_jsonstring);
-//                        Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        System.out.println(patient_info_jsonstring);
+                        Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     Map<String,String> zip_entry = new HashMap<>();
                     zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
                     Map<String, String> patient_status_entry = new HashMap<>();

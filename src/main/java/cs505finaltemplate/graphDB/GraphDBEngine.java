@@ -18,10 +18,10 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.db.ODatabaseType;
+
 import java.util.List;
+
 import com.google.gson.Gson;
-
-
 
 
 public class GraphDBEngine {
@@ -57,7 +57,7 @@ public class GraphDBEngine {
         if (hospital == null) {
             hospital = db.createVertexClass("hospital");
         }
-        if(hospital.getProperty("hospital_id") == null) {
+        if (hospital.getProperty("hospital_id") == null) {
             hospital.createProperty("hospital_id", OType.STRING);
             hospital.createIndex("hospital_id_index", OClass.INDEX_TYPE.NOTUNIQUE, "hospital_id");
         }
@@ -69,7 +69,7 @@ public class GraphDBEngine {
         if (event == null) {
             event = db.createVertexClass("event");
         }
-        if(event.getProperty("event_id") == null) {
+        if (event.getProperty("event_id") == null) {
             event.createProperty("event_id", OType.STRING);
             event.createIndex("event_id_index", OClass.INDEX_TYPE.NOTUNIQUE, "event_id");
         }
@@ -81,7 +81,7 @@ public class GraphDBEngine {
         if (vaccine == null) {
             vaccine = db.createVertexClass("vaccine");
         }
-        if(vaccine.getProperty("vaccine_id") == null) {
+        if (vaccine.getProperty("vaccine_id") == null) {
             vaccine.createProperty("vaccine_id", OType.STRING);
             vaccine.createIndex("vaccine_id_index", OClass.INDEX_TYPE.NOTUNIQUE, "vaccine_id");
         }
@@ -90,7 +90,7 @@ public class GraphDBEngine {
         }
 
 
-//        db.close();
+        db.close();
 //        orient.close();
 
     }
@@ -101,16 +101,17 @@ public class GraphDBEngine {
         }
         db.create(dbName, ODatabaseType.PLOCAL);
     }
+
     public void resetDB() {
         resetDB(orient, dbName);
     }
 
-    public void closeBD(){
-        db.close();
+    public void closeBD() {
+//        db.close();
         orient.close();
     }
 
-    public void cleadData(){
+    public void cleadData() {
         db.command("DELETE VERTEX patient");
         db.command("DELETE VERTEX hospital");
         db.command("DELETE VERTEX event");
@@ -129,111 +130,49 @@ public class GraphDBEngine {
         // If the node does not exist, create it
         // If the node has a contact, create an edge between the two nodes
         db = orient.open(dbName, "root", "rootpwd");
-
-        String query = "SELECT FROM patient WHERE patient_mrn = ?" ;
-//        OResultSet rs;
-//        rs = null;
-//        try{
-//            System.out.println("1234: ");
-//            rs = db.command(query, "1def220e-b4e8-11ec-a016-ac87a3187c5f");
-//            System.out.println("patient_mrn: " + patient.patient_mrn);
-//        }
-//        catch (Exception ex)
-//        {System.out.println("exception: ");
-//            ex.printStackTrace();
-//        }
+        String query = "SELECT FROM patient WHERE patient_mrn = ?";
         OResultSet rs = db.query(query, patient.patient_mrn);
-
         if (!rs.hasNext()) {
             System.out.println("rs is null");
         }
-
         if (rs.hasNext()) {
             OResult item = rs.next();
             if (item.isVertex()) {
-                OVertex result = item.getVertex().get();
-                result.setProperty("testing_id", patient.testing_id);
-                result.setProperty("patient_mrn", patient.patient_mrn);
-                result.setProperty("patient_name", patient.patient_name);
-                result.setProperty("patient_status", patient.patient_status);
-                result.setProperty("patient_zipcode", patient.patient_zipcode);
-                result.setProperty("patient_status", patient.patient_status);
-                result.setProperty("contact_list", patient.contact_list);
-                for(String event:patient.event_list)
-                {
-                    String query1 = "SELECT FROM event WHERE event_id = ?";
-                    OResultSet rs1 = db.query(query1, event);
-                    if (rs1.hasNext()) {
-                        OResult item1 = rs1.next();
-                        if (item1.isVertex()) {
-                            OVertex  v = item1.getVertex().orElse(null);
-                            OEdge edge = result.addEdge(v, "attended");
-                            edge.save();
-                        }
-                    } else {
-                        OVertex newEvent = db.newVertex("event");
-                        newEvent.setProperty("event_id", event);
-                        newEvent.save();
-                        OEdge edge = result.addEdge(newEvent, "attended");
-                        edge.save();
-                    }
-                    rs1.close();
-
-                }
-                result.save();
-                for (String contact : patient.contact_list) {
-                    rs = db.query(query, contact);
-                    if (rs.hasNext()) {
-                        item = rs.next();
-                        if (item.isVertex()) {
-                            OVertex  v = item.getVertex().orElse(null);
-                            OEdge edge = result.addEdge(v, "contact_with");
-                            edge.save();
-                        }
-                    } else {
-                        OVertex newContact = db.newVertex("patient");
-                        newContact.setProperty("patient_mrn", contact);
-                        newContact.save();
-                        OEdge edge = result.addEdge(newContact, "contact_with");
-                        edge.save();
-                    }
-//                    rs.close();
-                }
+                OVertex existingPatient = item.getVertex().get();
+                existingPatient.setProperty("testing_id", patient.testing_id);
+                existingPatient.setProperty("patient_mrn", patient.patient_mrn);
+                existingPatient.setProperty("patient_name", patient.patient_name);
+                existingPatient.setProperty("patient_status", patient.patient_status);
+                existingPatient.setProperty("patient_zipcode", patient.patient_zipcode);
+                existingPatient.setProperty("patient_status", patient.patient_status);
+                existingPatient.setProperty("contact_list", patient.contact_list);
+                existingPatient.setProperty("event_list", patient.event_list);
+                // add event edges and nodes
+                addEvent(patient, existingPatient);
+                // add contacts
+                addContacts(patient, existingPatient);
+                existingPatient.save();
             }
-        }
-        else
-        {
+        } else {
             System.out.println("Creating new patient");
-            OVertex result = db.newVertex("patient");
-            result.setProperty("testing_id", patient.testing_id);
-            result.setProperty("patient_mrn", patient.patient_mrn);
-            result.setProperty("patient_name", patient.patient_name);
-            result.setProperty("patient_status", patient.patient_status);
-            result.setProperty("patient_zipcode", patient.patient_zipcode);
-            result.setProperty("patient_status", patient.patient_status);
-            result.setProperty("contact_list", patient.contact_list);
-            result.save();
-            for (String contact : patient.contact_list) {
-                rs = db.query(query, contact);
-                if (rs.hasNext()) {
-                    OResult item = rs.next();
-                    if (item.isVertex()) {
-                        OVertex v = item.getVertex().get();
-                        OEdge edge = result.addEdge(v, "contact_with");
-                        edge.save();
-                    }
-                } else {
-                    OVertex newContact = db.newVertex("patient");
-                    newContact.setProperty("patient_mrn", contact);
-                    newContact.save();
-                    OEdge edge = result.addEdge(newContact, "contact_with");
-                    edge.save();
-                }
-
-            }
-
+            OVertex newPatient = db.newVertex("patient");
+            newPatient.setProperty("testing_id", patient.testing_id);
+            newPatient.setProperty("patient_mrn", patient.patient_mrn);
+            newPatient.setProperty("patient_name", patient.patient_name);
+            newPatient.setProperty("patient_status", patient.patient_status);
+            newPatient.setProperty("patient_zipcode", patient.patient_zipcode);
+            newPatient.setProperty("patient_status", patient.patient_status);
+            newPatient.setProperty("contact_list", patient.contact_list);
+            newPatient.setProperty("event_list", patient.event_list);
+            newPatient.save();
+            // add event edges and nodes
+            addEvent(patient, newPatient);
+            // add contacts
+            addContacts(patient, newPatient);
+            newPatient.save();
         }
         rs.close();
+        db.close();
     }
 
     public void addPatient(int testing_id, String patient_name, String patient_mrn, String patient_zipcode, String patient_status, List<String> contact_list, List<String> event_list) {
@@ -241,8 +180,7 @@ public class GraphDBEngine {
         addPatient(patient);
     }
 
-    public void addPatient(String jsonString)
-    {
+    public void addPatient(String jsonString) {
         Gson gson = new Gson();
         System.out.println("jsonString: " + jsonString);
         TestingData patient = gson.fromJson(jsonString, TestingData.class);
@@ -254,27 +192,33 @@ public class GraphDBEngine {
         addPatient(patient);
     }
 
-    public void printString(String s){
-        System.out.println(s);
-    }
 
-    public void addHospital(HospitalData hospital) {
-        String query = "SELECT FROM hospital WHERE hospital_id = ?";
-        OResultSet rs = db.query(query, hospital.hospital_id);
-        if (rs.hasNext()) {
-            OResult item = rs.next();
-            if (item.isVertex()) {
-                OVertex thisHospital = item.getVertex().get();
+    public void addHospital(HospitalData hospital)
+    {
+        db = orient.open(dbName, "root", "rootpwd");
+        String hospitalQuery = "SELECT FROM hospital WHERE hospital_id = ?";
+        OResultSet hospitalRS = db.query(hospitalQuery, hospital.hospital_id);
+        System.out.println("hospitalQuery: " + hospitalQuery);
+        if (hospitalRS.hasNext()) {
+            OResult existingHospital = hospitalRS.next();
+            if (existingHospital.isVertex()) {
+                OVertex thisHospital = existingHospital.getVertex().get();
                 thisHospital.setProperty("hospital_id", hospital.hospital_id);
                 thisHospital.save();
                 String patientQuery = "SELECT FROM patient WHERE patient_mrn = ?";
-                rs = db.query(patientQuery, hospital.patient_mrn);
-                if (rs.hasNext()) {
-                    item = rs.next();
-                    if (item.isVertex()) {
-                        OVertex thisPatient = item.getVertex().get();
-                        OEdge edge = thisPatient.addEdge(thisHospital, "hospitalized_at");
-                        edge.save();
+                OResultSet patientRS = db.query(patientQuery, hospital.patient_mrn);
+                if (patientRS.hasNext()) {
+                    existingHospital = patientRS.next();
+                    if (existingHospital.isVertex()) {
+                        OVertex thisPatient = existingHospital.getVertex().get();
+                        // If there is no edge between the patient and the hospital, create one
+                        String edgeQuery = "SELECT FROM hospitalized_at WHERE out = ? AND in = ?";
+                        OResultSet edgeRS = db.query(edgeQuery, thisPatient, thisHospital);
+                        if (!edgeRS.hasNext()) {
+                            OEdge edge = thisPatient.addEdge(thisHospital, "hospitalized_at");
+                            edge.save();
+                        }
+                        edgeRS.close();
                     }
                 } else {
                     OVertex newPatient = db.newVertex("patient");
@@ -284,108 +228,174 @@ public class GraphDBEngine {
                     OEdge edge = newPatient.addEdge(thisHospital, "hospitalized_at");
                     edge.save();
                 }
+            }
+        }
+        else {
+            // create hospital
+            // if the patient exists, create edge
+            // if the patient does not exist, create patient and edge
+            System.out.println("Creating new hospital");
+            OVertex newHospital = db.newVertex("hospital");
+            newHospital.setProperty("hospital_id", hospital.hospital_id);
+            String patientQuery = "SELECT FROM patient WHERE patient_mrn = ?";
+            OResultSet patientRS = db.query(patientQuery, hospital.patient_mrn);
+            if (patientRS.hasNext()) {
+                OResult patient = patientRS.next();
+                if (patient.isVertex()) {
+                    OVertex thisPatient = patient.getVertex().get();
+                    // if there is no edge between the patient and the hospital, create one
+                    String edgeQuery = "SELECT FROM hospitalized_at WHERE out = ? AND in = ?";
+                    OResultSet edgeRS = db.query(edgeQuery, thisPatient, newHospital);
+                    if (!edgeRS.hasNext()) {
+                        OEdge edge = thisPatient.addEdge(newHospital, "hospitalized_at");
+                        edge.save();
+                    }
+                    edgeRS.close();
+                }
             } else {
-                // create hospital
+                OVertex newPatient = db.newVertex("patient");
+                newPatient.setProperty("patient_mrn", hospital.patient_mrn);
+                newPatient.setProperty("patient_name", hospital.patient_name);
+                newPatient.save();
+                // create edge
+                // If there is no edge between the patient and the hospital, create one
+                String edgeQuery = "SELECT FROM hospitalized_at WHERE out = ? AND in = ?";
+                OResultSet edgeRS = db.query(edgeQuery, newPatient, newHospital);
+                if (!edgeRS.hasNext()) {
+                    OEdge edge = newPatient.addEdge(newHospital, "hospitalized_at");
+                    edge.save();
+                }
+                edgeRS.close();
+            }
+            newHospital.save();
+        }
+        hospitalRS.close();
+        db.close();
+    }
+
+    public void addVaccine(VaxData vaccine)
+        {
+            db = orient.open(dbName, "root", "rootpwd");
+            String query = "SELECT FROM vaccine WHERE  vaccination_id = ?";
+            OResultSet rs = db.query(query, vaccine.vaccination_id);
+            if (rs.hasNext()) {
+                OResult item = rs.next();
+                if (item.isVertex()) {
+                    // update vaccine
+                    OVertex thisVaccine = item.getVertex().get();
+                    String patientQuery = "SELECT FROM patient WHERE patient_mrn = ?";
+                    rs = db.query(patientQuery, vaccine.patient_mrn);
+                    if (rs.hasNext()) {
+                        item = rs.next();
+                        if (item.isVertex()) {
+                            OVertex thisPatient = item.getVertex().get();
+                            OEdge edge = thisPatient.addEdge(thisVaccine, "vaccinated_with");
+                            edge.save();
+                        }
+                    } else {
+                        OVertex newPatient = db.newVertex("patient");
+                        newPatient.setProperty("patient_mrn", vaccine.patient_mrn);
+                        newPatient.save();
+                        OEdge edge = newPatient.addEdge(thisVaccine, "vaccinated_with");
+                        edge.save();
+                    }
+                }
+            }
+            else {
+                // the vaccine does not exist
+                // create the vaccine
                 // if the patient exists, create edge
                 // if the patient does not exist, create patient and edge
-                OVertex newHospital = db.newVertex("hospital");
-                newHospital.setProperty("hospital_id", hospital.hospital_id);
-                newHospital.save();
+                OVertex newVaccine = db.newVertex("vaccine");
+                newVaccine.setProperty("vaccination_id", vaccine.vaccination_id);
+                newVaccine.save();
                 String patientQuery = "SELECT FROM patient WHERE patient_mrn = ?";
-                rs = db.query(patientQuery, hospital.patient_mrn);
+                rs = db.query(patientQuery, vaccine.patient_mrn);
                 if (rs.hasNext()) {
-                    item = rs.next();
+                    OResult item = rs.next();
                     if (item.isVertex()) {
                         OVertex thisPatient = item.getVertex().get();
-                        OEdge edge = thisPatient.addEdge(newHospital, "hospitalized_at");
+                        OEdge edge = thisPatient.addEdge(newVaccine, "vaccinated_with");
                         edge.save();
                     }
                 } else {
                     OVertex newPatient = db.newVertex("patient");
-                    newPatient.setProperty("patient_mrn", hospital.patient_mrn);
-                    newPatient.setProperty("patient_name", hospital.patient_name);
+                    newPatient.setProperty("patient_mrn", vaccine.patient_mrn);
+                    newPatient.setProperty("patient_name", vaccine.patient_name);
                     newPatient.save();
-                    OEdge edge = newPatient.addEdge(newHospital, "hospitalized_at");
+                    OEdge edge = newPatient.addEdge(newVaccine, "vaccinated_with");
                     edge.save();
                 }
             }
-        }
-        rs.close();
+            rs.close();
+            db.close();
     }
 
-    public void addVaccine(VaxData vaccine)
+    // Only used in the addPatient method
+    private void addEvent(TestingData patient, OVertex existingPatient)
     {
-        String query = "SELECT FROM vaccine WHERE  vaccination_id = ?";
-        OResultSet rs = db.query(query, vaccine.vaccination_id);
-        if (rs.hasNext())
-        {
-            OResult item = rs.next();
-            if (item.isVertex())
-            {
-                // update vaccine
-                OVertex thisVaccine = item.getVertex().get();
-                String patientQuery = "SELECT FROM patient WHERE patient_mrn = ?";
-                rs = db.query(patientQuery, vaccine.patient_mrn);
-                if (rs.hasNext())
-                {
-                    item = rs.next();
-                    if (item.isVertex())
-                    {
-                        OVertex thisPatient = item.getVertex().get();
-                        OEdge edge = thisPatient.addEdge(thisVaccine, "vaccinated_with");
+
+        for (String event : patient.event_list) {
+            String query1 = "SELECT FROM event WHERE event_id = ?";
+            OResultSet rs1 = db.query(query1, event);
+            if (rs1.hasNext()) {
+                OResult item1 = rs1.next();
+                if (item1.isVertex()) {
+                    OVertex v = item1.getVertex().orElse(null);
+                    // If node exists, create an edge between the two nodes
+                    String edgeQuery = "SELECT FROM attended WHERE out = ? AND in = ?";
+                    OResultSet edgeRS = db.query(edgeQuery, existingPatient, v);
+                    if (!edgeRS.hasNext()) {
+                        OEdge edge = existingPatient.addEdge(v, "attended");
                         edge.save();
                     }
+                    edgeRS.close();
                 }
-                else {
-                    OVertex newPatient = db.newVertex("patient");
-                    newPatient.setProperty("patient_mrn", vaccine.patient_mrn);
-                    newPatient.save();
-                    OEdge edge = newPatient.addEdge(thisVaccine, "vaccinated_with");
+            } else {
+                // If node does not exist, create it and create an edge between the two nodes
+                OVertex newEvent = db.newVertex("event");
+                newEvent.setProperty("event_id", event);
+                newEvent.save();
+                // If edge does not exist, create it
+                String edgeQuery = "SELECT FROM attended WHERE out = ? AND in = ?";
+                OResultSet edgeRS = db.query(edgeQuery, existingPatient, newEvent);
+                if (!edgeRS.hasNext()) {
+                    OEdge edge = existingPatient.addEdge(newEvent, "attended");
                     edge.save();
                 }
+                edgeRS.close();
             }
+            rs1.close();
         }
-        else
-        {
-            // the vaccine does not exist
-            // create the vaccine
-            // if the patient exists, create edge
-            // if the patient does not exist, create patient and edge
-            OVertex newVaccine = db.newVertex("vaccine");
-            newVaccine.setProperty("vaccination_id", vaccine.vaccination_id);
-            newVaccine.save();
-            String patientQuery = "SELECT FROM patient WHERE patient_mrn = ?";
-            rs = db.query(patientQuery, vaccine.patient_mrn);
-            if (rs.hasNext())
-            {
-                OResult item = rs.next();
-                if (item.isVertex())
-                {
-                    OVertex thisPatient = item.getVertex().get();
-                    OEdge edge = thisPatient.addEdge(newVaccine, "vaccinated_with");
+    }
+
+    // Only used in the addPatient method
+    private void addContacts(TestingData patient, OVertex existingPatient)
+    {
+        for (String contact : patient.contact_list) {
+            if (!contact.equals(patient.patient_mrn)) {
+                String contactsQuery = "SELECT FROM patient WHERE patient_mrn = ?";
+                OResultSet contactsRS = db.query(contactsQuery, contact);
+                if (contactsRS.hasNext()) {
+                    OResult item = contactsRS.next();
+                    if (item.isVertex()) {
+                        OVertex v = item.getVertex().orElse(null);
+                        OEdge edge = existingPatient.addEdge(v, "contact_with");
+                        edge.save();
+                    }
+                } else {
+                    OVertex newContact = db.newVertex("patient");
+                    newContact.setProperty("patient_mrn", contact);
+                    newContact.save();
+                    OEdge edge = existingPatient.addEdge(newContact, "contact_with");
                     edge.save();
                 }
-            }
-            else
-            {
-                OVertex newPatient = db.newVertex("patient");
-                newPatient.setProperty("patient_mrn", vaccine.patient_mrn);
-                newPatient.setProperty("patient_name", vaccine.patient_name);
-                newPatient.save();
-                OEdge edge = newPatient.addEdge(newVaccine, "vaccinated_with");
-                edge.save();
+                contactsRS.close();
             }
         }
-        rs.close();
     }
-
-    private void addEvent(ODatabaseSession db, String event_id) {
-        OVertex result = db.newVertex("event");
-        result.setProperty("event_id", event_id);
-        result.save();
-    }
-
-    public void getContacts( String patient_mrn) {
+    public void getContacts(String patient_mrn) {
+        db = orient.open(dbName, "root", "rootpwd");
 
         String query = "SELECT FROM (TRAVERSE inE(), outE(), inV(), outV() \n" +
                 "FROM (SELECT FROM patient WHERE patient_mrn = ?) \n" +
@@ -399,15 +409,16 @@ public class GraphDBEngine {
 
         while (rs.hasNext()) {
             OResult item = rs.next();
-            if (! item.getProperty("patient_mrn").equals(patient_mrn)) {
+            if (!item.getProperty("patient_mrn").equals(patient_mrn)) {
                 System.out.println("contact: " + item.getProperty("patient_name"));
             }
         }
 
         rs.close(); //REMEMBER TO ALWAYS CLOSE THE RESULT SET!!!
+        db.close();
     }
 
-    public void getPossibleContacts( String patient_mrn) {
+    public void getPossibleContacts(String patient_mrn) {
 
         String query = "SELECT FROM (TRAVERSE inE(), outE(), inV(), outV() \n" +
                 "FROM (SELECT FROM patient WHERE patient_mrn = ?) \n" +
