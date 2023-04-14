@@ -28,7 +28,7 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException {
 
-        // graphDBEngine = new GraphDBEngine("test");
+        graphDBEngine = new GraphDBEngine("test");
         // **** start CEP init
 
         cepEngine = new CEPEngine();

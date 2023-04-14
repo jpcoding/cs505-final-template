@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import cs505finaltemplate.Launcher;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.PrintWriter;
@@ -42,7 +39,7 @@ public class API {
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
             responseMap.put("Team_members_sids", "[12028230,12648912]");
-            responseMap.put("app_status_code", "0");
+            responseMap.put("app_status_code", "1");
 
             responseString = gson.toJson(responseMap);
 
@@ -55,7 +52,7 @@ public class API {
     @GET
     @Path("/getlastcep")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAccessCount(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getAccessCount() {
         String responseString = "{}";
         try {
             // generate a response
@@ -70,11 +67,12 @@ public class API {
     @GET
     @Path("/reset")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response reset(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response reset() {
         // @todo: status code 0 means fail, 1 means success. make that work.
         String responseString = "{}";
         try {
-            Launcher.graphDBEngine.resetDB();
+
+            Launcher.graphDBEngine.cleadData();
             Launcher.cepEngine.cleanDB();
 
             Map<String, String> responseMap = new HashMap<>();
@@ -125,12 +123,13 @@ public class API {
 
     // graph API functions
     @GET
-    @Path("/getconfirmedcontacts")
+    @Path("/getconfirmedcontacts/{patient_mrn}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getConfirmedContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getConfirmedContacts(@PathParam("patient_mrn") String patient_mrn) {
         // @todo: implement
         String responseString = "{}";
         try {
+            responseString = Launcher.graphDBEngine.getConfirmedContacts(patient_mrn);
 
         } catch (Exception ex) {
             return printException(ex);
@@ -139,13 +138,28 @@ public class API {
     }
 
     @GET
-    @Path("/getpossiblecontacts")
+    @Path("/getpossiblecontacts/{patient_mrn}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPossibleContacts(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getPossibleContacts((@PathParam("patient_mrn") String patient_mrn) {
+        String responseString = "{}";
+        try {
+            responseString = Launcher.graphDBEngine.getPossibleContacts(patient_mrn);
+        } catch (Exception ex) {
+            return printException(ex);
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/getpatientstatus/{hospital_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPatientStatus((@PathParam("hospital_id") String hospital_id ) {
         // @todo: implement
         String responseString = "{}";
         try {
-
+            responseString = Launcher.graphDBEngine.getPatientStatusofOneHospital(hospital_id);
+        } catch (Exception ex) {
+            return printException(ex);
         } catch (Exception ex) {
             return printException(ex);
         }
@@ -155,16 +169,19 @@ public class API {
     @GET
     @Path("/getpatientstatus")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPatientStatus(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getPatientStatus( ) {
         // @todo: implement
         String responseString = "{}";
         try {
-
+            responseString = Launcher.graphDBEngine.getPatientStatusofAllHospital();
+        } catch (Exception ex) {
+            return printException(ex);
         } catch (Exception ex) {
             return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
+
 
     private Response printException(Exception ex) {
 

@@ -39,7 +39,7 @@ public class TestGraph
         Gson gson = new Gson();
         System.out.println("Testing Graph");
         GraphDBEngine graphDBEngine = new GraphDBEngine("test");
-
+//
         try {
             // Open the JSON file for reading
             FileReader reader = new FileReader("rPublisher-master/patient_data.json");
@@ -60,11 +60,11 @@ public class TestGraph
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // create a graph database
-        // add the data to the graph database
-        // query the graph database
-        // close the graph database
-        graphDBEngine.getContacts("1def254c-b4e8-11ec-a016-ac87a3187c5f");
+//         create a graph database
+//         add the data to the graph database
+//         query the graph database
+//         close the graph database
+
         // add hospital data
         try {
             // Open the JSON file for reading
@@ -72,28 +72,32 @@ public class TestGraph
             List<HospitalData> data = gson.fromJson(reader, typeListHospitalData);
             reader.close();
             for (HospitalData testingData : data) {
-                System.out.println(testingData.patient_name);
+//                System.out.println(testingData.patient_name);
                 graphDBEngine.addHospital(testingData);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // add vax data
+//         add vax data
         try{
             FileReader reader = new FileReader("rPublisher-master/vax_data.json");
             List<VaxData> data = gson.fromJson(reader, typeListVaxData);
             reader.close();
             for (VaxData testingData : data) {
-                System.out.println(testingData.vaccination_id);
+//                System.out.println(testingData.vaccination_id);
                 graphDBEngine.addVaccine(testingData);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        graphDBEngine.cleadData();
+        String test = graphDBEngine.getPossibleContacts("89f0c5be-d834-11ed-a071-e4b318c5b66f");
 
-        graphDBEngine.closeBD();
+System.out.println("look here");
+
+        System.out.println(test);
+
+//        graphDBEngine.closeBD();
 //
 
     }
