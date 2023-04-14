@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import cs505finaltemplate.Launcher;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.PrintWriter;
@@ -80,7 +77,7 @@ public class API {
         String responseString = "{}";
         try {
 
-            Launcher.graphDBEngine.resetDB();
+            Launcher.graphDBEngine.cleadData();
             Launcher.cepEngine.cleanDB();
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("status_code", "1");
@@ -128,10 +125,11 @@ public class API {
     @GET
     @Path("/getconfirmedcontacts/{patient_mrn}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getConfirmedContacts(@HeaderParam("patient_mrn") String patient_mrn) {
+    public Response getConfirmedContacts(@PathParam("patient_mrn") String patient_mrn) {
         // @todo: implement
         String responseString = "{}";
         try {
+            responseString = Launcher.graphDBEngine.getConfirmedContacts(patient_mrn);
 
         } catch (Exception ex) {
             return printException(ex);

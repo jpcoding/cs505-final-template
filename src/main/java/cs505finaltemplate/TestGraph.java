@@ -40,31 +40,31 @@ public class TestGraph
         System.out.println("Testing Graph");
         GraphDBEngine graphDBEngine = new GraphDBEngine("test");
 //
-//        try {
-//            // Open the JSON file for reading
-//            FileReader reader = new FileReader("rPublisher-master/patient_data.json");
-//            // Use TypeToken to specify the type of the list
-//            // Deserialize the JSON data into a list of objects
-//            List<TestingData> data = gson.fromJson(reader, typeListTestingData);
-//            // Close the file
-//            reader.close();
-//            // Iterate over the list and print each object
-//            for (TestingData testingData : data) {
-////                System.out.println(testingData.patient_name);
-////                System.out.println(testingData.patient_mrn);
-//                Gson patient_info = new Gson();
-//                String patient_info_jsonstring = patient_info.toJson(testingData);
-//                graphDBEngine.addPatient(patient_info_jsonstring);
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        // create a graph database
-        // add the data to the graph database
-        // query the graph database
-        // close the graph database
-//        graphDBEngine.getContacts("1def254c-b4e8-11ec-a016-ac87a3187c5f");
+        try {
+            // Open the JSON file for reading
+            FileReader reader = new FileReader("rPublisher-master/patient_data.json");
+            // Use TypeToken to specify the type of the list
+            // Deserialize the JSON data into a list of objects
+            List<TestingData> data = gson.fromJson(reader, typeListTestingData);
+            // Close the file
+            reader.close();
+            // Iterate over the list and print each object
+            for (TestingData testingData : data) {
+//                System.out.println(testingData.patient_name);
+//                System.out.println(testingData.patient_mrn);
+                Gson patient_info = new Gson();
+                String patient_info_jsonstring = patient_info.toJson(testingData);
+                graphDBEngine.addPatient(patient_info_jsonstring);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//         create a graph database
+//         add the data to the graph database
+//         query the graph database
+//         close the graph database
+
         // add hospital data
         try {
             // Open the JSON file for reading
@@ -72,7 +72,7 @@ public class TestGraph
             List<HospitalData> data = gson.fromJson(reader, typeListHospitalData);
             reader.close();
             for (HospitalData testingData : data) {
-                System.out.println(testingData.patient_name);
+//                System.out.println(testingData.patient_name);
                 graphDBEngine.addHospital(testingData);
             }
         } catch (IOException e) {
@@ -85,14 +85,17 @@ public class TestGraph
             List<VaxData> data = gson.fromJson(reader, typeListVaxData);
             reader.close();
             for (VaxData testingData : data) {
-                System.out.println(testingData.vaccination_id);
+//                System.out.println(testingData.vaccination_id);
                 graphDBEngine.addVaccine(testingData);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String test = graphDBEngine.getConfirmedContacts("89f0c5be-d834-11ed-a071-e4b318c5b66f");
+System.out.println("look here");
+        System.out.println(test);
 
-        graphDBEngine.closeBD();
+//        graphDBEngine.closeBD();
 //
 
     }
