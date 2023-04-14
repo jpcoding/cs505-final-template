@@ -88,7 +88,7 @@ public class API {
     @GET
     @Path("/zipalertlist")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getZipAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getZipAlertList() {
         // We define alert state as a growth of 2X over two batches of messages.
         String responseString = "{}";
         try {
@@ -105,7 +105,7 @@ public class API {
     @GET
     @Path("/alertlist")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
+    public Response getAlertList() {
         // state_status = 0 = not alert, 1 = alert
         // alert on statewide when at least five zipcodes are in alert state
         // @todo: (based on RT1) within the same 15 second window.
@@ -140,7 +140,7 @@ public class API {
     @GET
     @Path("/getpossiblecontacts/{patient_mrn}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPossibleContacts((@PathParam("patient_mrn") String patient_mrn) {
+    public Response getPossibleContacts(@PathParam("patient_mrn") String patient_mrn) {
         String responseString = "{}";
         try {
             responseString = Launcher.graphDBEngine.getPossibleContacts(patient_mrn);
@@ -153,13 +153,11 @@ public class API {
     @GET
     @Path("/getpatientstatus/{hospital_id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPatientStatus((@PathParam("hospital_id") String hospital_id ) {
+    public Response getPatientStatus(@PathParam("hospital_id") String hospital_id) {
         // @todo: implement
         String responseString = "{}";
         try {
             responseString = Launcher.graphDBEngine.getPatientStatusofOneHospital(hospital_id);
-        } catch (Exception ex) {
-            return printException(ex);
         } catch (Exception ex) {
             return printException(ex);
         }
@@ -169,19 +167,16 @@ public class API {
     @GET
     @Path("/getpatientstatus")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPatientStatus( ) {
+    public Response getPatientStatus() {
         // @todo: implement
         String responseString = "{}";
         try {
             responseString = Launcher.graphDBEngine.getPatientStatusofAllHospital();
         } catch (Exception ex) {
             return printException(ex);
-        } catch (Exception ex) {
-            return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
-
 
     private Response printException(Exception ex) {
 
