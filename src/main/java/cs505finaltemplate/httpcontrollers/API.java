@@ -39,7 +39,6 @@ public class API {
     public Response getTeam() {
         String responseString = "{}";
         try {
-            System.out.println("WHAT");// @todo: remove debug line
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("team_name", "templateTeam");
             responseMap.put("Team_members_sids", "[12028230,12648912]");
@@ -59,12 +58,8 @@ public class API {
     public Response getAccessCount(@HeaderParam("X-Auth-API-Key") String authKey) {
         String responseString = "{}";
         try {
-
             // generate a response
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("lastoutput", Launcher.lastCEPOutput);
-            responseString = gson.toJson(responseMap);
-
+            responseString = gson.toJson(Launcher.lastCEPOutput);
         } catch (Exception ex) {
             return printException(ex);
         }
@@ -79,13 +74,12 @@ public class API {
         // @todo: status code 0 means fail, 1 means success. make that work.
         String responseString = "{}";
         try {
-
             Launcher.graphDBEngine.resetDB();
             Launcher.cepEngine.cleanDB();
+
             Map<String, String> responseMap = new HashMap<>();
             responseMap.put("status_code", "1");
             responseString = gson.toJson(responseMap);
-
         } catch (Exception ex) {
             return printException(ex);
         }
@@ -97,11 +91,13 @@ public class API {
     @Path("/zipalertlist")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getZipAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
-        // @todo: implement
         // We define alert state as a growth of 2X over two batches of messages.
         String responseString = "{}";
         try {
-
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("ziplist", Launcher.alert_list);
+            responseString = gson.toJson(responseMap);
+            System.out.println("zip alert list: " + responseString + "\n");// @todo: remove debug line
         } catch (Exception ex) {
             return printException(ex);
         }
@@ -112,12 +108,15 @@ public class API {
     @Path("/alertlist")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAlertList(@HeaderParam("X-Auth-API-Key") String authKey) {
-        // @todo: implement - state_status = 0 = not alert, 1 = alert
+        // state_status = 0 = not alert, 1 = alert
         // alert on statewide when at least five zipcodes are in alert state
-        // (based on RT1) within the same 15 second window.
+        // @todo: (based on RT1) within the same 15 second window.
         String responseString = "{}";
         try {
+            Map<String, String> responseMap = new HashMap<>();
+            responseMap.put("state_status", (Launcher.cepEngine.getStateAlert()) ? "1" : "0");
 
+            responseString = gson.toJson(responseMap);
         } catch (Exception ex) {
             return printException(ex);
         }

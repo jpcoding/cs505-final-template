@@ -1,12 +1,17 @@
 package cs505finaltemplate.CEP;
 
 import com.google.gson.Gson;
+import com.rabbitmq.client.RpcClient.Response;
+
+import cs505finaltemplate.Launcher;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.stream.output.sink.InMemorySink;
 import io.siddhi.core.util.transport.InMemoryBroker;
 import io.siddhi.query.api.definition.TableDefinition;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,11 +21,6 @@ public class CEPEngine {
     private SiddhiManager siddhiManager;
     private SiddhiAppRuntime siddhiAppRuntime;
     private Map<String, String> topicMap;
-
-    // table definition queries
-    private String zipAlertTable = "zipAlerts";
-    private String zipAlertQueryString = "@PrimaryKey('zip_code') " + "define table " + zipAlertTable
-            + " (zip_code int, alert_status bool)";
 
     private Gson gson;
 
@@ -79,8 +79,6 @@ public class CEPEngine {
             // Starting event processing
             siddhiAppRuntime.start();
 
-            initializeTables();
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -107,33 +105,20 @@ public class CEPEngine {
     public void cleanDB() {
         try {
             // clean cep database
-            String query = "delete " + zipAlertTable + ";";
-            siddhiAppRuntime.query(query);
+            Launcher.alert_list.clear();
+            Launcher.lastCEPOutput.clear();
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public void getZipAlerts() {
-
+    public List<Integer> getZipAlerts() {
+        return Launcher.alert_list;
     }
 
-    public void getStateAlert() {
-
-    }
-
-    // create tables for the cep to remember stuff
-    private void initializeTables() {
-
-//        siddhiAppRuntime.query(zipAlertQueryString);
-
-        // @todo: get rid of debug lines
-        System.out.println("table definition:\n");
-        Map<String, TableDefinition> tableDef = siddhiAppRuntime.getTableDefinitionMap();
-        for (Map.Entry<String, TableDefinition> entry : tableDef.entrySet()) {
-            System.out.println("\t" + entry.getKey() + ": " + entry.getValue() + "\n");
-        }
+    public boolean getStateAlert() {
+        return Launcher.alert_list.size() >= 5;
     }
 
     private String getSourceString(String inputStreamAttributesString, String topic, String streamName) {

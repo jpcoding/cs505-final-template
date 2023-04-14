@@ -49,8 +49,8 @@ public class TopicConnector {
             Channel channel = connection.createChannel();
 
             patientListChannel(channel);
-//            hospitalListChannel(channel);
-//            vaxListChannel(channel);
+            // hospitalListChannel(channel);
+            // vaxListChannel(channel);
 
         } catch (Exception ex) {
             System.out.println("connect Error: " + ex.getMessage());
@@ -75,57 +75,51 @@ public class TopicConnector {
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
                 String message = new String(delivery.getBody(), "UTF-8");
-//                System.out.println(" [x] Received Patient List Batch'" +
-//                        delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
+                // System.out.println(" [x] Received Patient List Batch'" +
+                // delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
 
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
-//                Gson patient_info = new Gson();
-//                String patient_info_jsonstring = patient_info.toJson(incomingList.get(0));
+                // Gson patient_info = new Gson();
+                // String patient_info_jsonstring = patient_info.toJson(incomingList.get(0));
 
-//                Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+                // Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
 
                 for (TestingData testingData : incomingList) {
 
                     // Check if this data is perfect data first.
                     Gson patient_info = new Gson();
                     String patient_info_jsonstring = patient_info.toJson(testingData);
-//                    System.out.println(patient_info_jsonstring);
-//                    try {
-//                        System.out.println(patient_info_jsonstring);
-//                        Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-                    Map<String,String> zip_entry = new HashMap<>();
-                    zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
+                    // System.out.println(patient_info_jsonstring);
+                    // try {
+                    // System.out.println(patient_info_jsonstring);
+                    // Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+                    // } catch (Exception e) {
+                    // e.printStackTrace();
+                    // }
+                    Map<String, String> zip_entry = new HashMap<>();
+                    zip_entry.put("zip_code", String.valueOf(testingData.patient_zipcode));
                     Map<String, String> patient_status_entry = new HashMap<>();
                     patient_status_entry.put("patient_status", testingData.patient_status);
+
                     Map<String, Object> combinedMap = new HashMap<>();
                     combinedMap.putAll(zip_entry);
                     combinedMap.putAll(patient_status_entry);
+                    System.out.println("combined map: " + combinedMap.toString());// @todo: delete debug line
+
                     Gson gson = new Gson();
                     String testInput = gson.toJson(combinedMap);
-                    Launcher.cepEngine.input("testInStream",testInput);
+                    Launcher.cepEngine.input("testInStream", testInput);
 
-//
-
-                    // conditions to ignore imperfect data
-                    // Data to send to CEPEngine
-
-//                    Launcher.graphDBEngine.addPatient(testingData);
-//                    System.out.println(patient_info_jsonstring);
+                    // Launcher.graphDBEngine.addPatient(testingData);
+                    // System.out.println(patient_info_jsonstring);
                     // uncomment for debug
                     // System.out.println("testInput: " + testInput);
-
-                    // insert into CEP
-//                    Launcher.cepEngine.input("testInStream", patient_info_jsonstring);
 
                     // Launcher.graphDBEngine.addPatient(testingData);
 
                     // do something else with each record
                     /*
-                     * System.out.println("*Java Class*");
-                     * System.out.println("\ttesting_id = " +
+                     * System.out.println("*Java Class*"); System.out.println("\ttesting_id = " +
                      * testingData.testing_id); System.out.println("\tpatient_name = " +
                      * testingData.patient_name); System.out.println("\tpatient_mrn = " +
                      * testingData.patient_mrn); System.out.println("\tpatient_zipcode = " +

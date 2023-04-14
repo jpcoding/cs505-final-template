@@ -23,13 +23,12 @@ public class Launcher {
     public static TopicConnector topicConnector;
     public static final int WEB_PORT = 8082;
 
-    public static String lastCEPOutput = "{}";
-
-    public static List<String> alert_list = new ArrayList<String>();
+    public static Map<String, String> lastCEPOutput;
+    public static List<Integer> alert_list = new ArrayList<Integer>();
 
     public static void main(String[] args) throws IOException {
 
-//        graphDBEngine = new GraphDBEngine("test");
+        // graphDBEngine = new GraphDBEngine("test");
         // **** start CEP init
 
         cepEngine = new CEPEngine();
@@ -42,28 +41,10 @@ public class Launcher {
         String outputStreamName = "testOutStream";
         String outputStreamAttributesString = "zip_code string, patient_status string, count long";
 
-        // @todo: still need to figure out how to compare two message batches.
+        // @todo: patient_status = 1 or patient_status = "1"?
         // positive case counts per zip_code, grouped by zip_code
-        System.out.println("boi\n");
-        String alertQueryString = "from " + inputStreamName + "#window.timeBatch(5 sec) "
-                + "select zip_code, count() as count "+
-                "group by zip_code " +
-                "having patient_status == 1 " + // 1 is positive, 0 is negative
-                "insert into testOutStream; ";
-
-        alertQueryString = "from testInStream#window.timeBatch(5 sec) " +
-                "select zip_code, patient_status, count() as count " +
-                "group by zip_code " +
-                "having patient_status == \"1\" " +
-                "insert into testOutStream;";
-
-        System.out.println(alertQueryString);
-
-//        String alertQueryString = " " +
-//                "from testInStream#window.timeBatch(5 sec) " +
-//                "select zip_code, count() as count " +
-//                "insert into testOutStream; ";
-
+        String alertQueryString = "from testInStream " + "select zip_code, patient_status, count() as count "
+                + "group by zip_code " + "having patient_status == \"1\" " + "insert into testOutStream;";
 
         cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
                 outputStreamAttributesString, alertQueryString);
