@@ -456,18 +456,240 @@ public class GraphDBEngine {
         return jsonString;
     }
 
-    public void getPossibleContacts(String patient_mrn) {
+    public String getPossibleContacts(String patient_mrn) {
 
-        String query = "SELECT FROM (TRAVERSE inE(), outE(), inV(), outV() \n" +
-                "FROM (SELECT FROM patient WHERE patient_mrn = ?) \n" +
-                "WHILE $depth <= 2)\n" +
-                "WHERE @class = 'patient'\n";
-
-
+        String query =
+                "MATCH\n" +
+                "{Class: patient, as: p, where: (patient_mrn = ?)} -attended-> {Class: event, as: e} <-attended- {Class: patient, as: others}\n" +
+                " RETURN  e.event_id, others.patient_mrn \n";
+        OrientDB orient;
+        ODatabaseSession db;
+        orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
+        db = orient.open(dbName, "root", "rootpwd");
+        OResultSet rs = db.query(query, patient_mrn);
+        Map<String, List<String>> possibleContacts = new HashMap<>();
+        while (rs.hasNext()) {
+            OResult item = rs.next();
+            String event_id = item.getProperty("e.event_id");
+            String patient_mrn1 = item.getProperty("others.patient_mrn");
+            if (possibleContacts.containsKey(event_id)) {
+                possibleContacts.get(event_id).add(patient_mrn1);
+            } else {
+                List<String> list = new ArrayList<>();
+                list.add(patient_mrn1);
+                possibleContacts.put(event_id, list);
+            }
+        }
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(possibleContacts);
+        System.out.println(jsonString);
+        rs.close();
+        db.close();
+        orient.close();
+        return jsonString;
     }
 
-}
+    public String getPatientStatusofOneHospital(String hospital_id) {
+        OrientDB orient;
+        ODatabaseSession db;
+        orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
+        db = orient.open(dbName, "root", "rootpwd");
 
+        Map<String , Object> patientStatus = new HashMap<>();
+        // get the number of patients
+
+        String query = "Select count(*) as count from(\n" +
+                "MATCH {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id = ?) }\n" +
+                "RETURN p\n" +
+                "  ) ";
+        OResultSet result = db.query(query, hospital_id);
+        int inpatient_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            inpatient_count = item.getProperty("count");
+        }
+        patientStatus.put("in-patient_count", inpatient_count);
+
+        // get in-patient_vaccine, who has received vaccine
+        query  = "Select count(p) as count from(\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id =?) }\n" +
+                "RETURN p)";
+        OResultSet result = db.query(query, hospital_id);
+        int inpatient_vaccine_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            inpatient_vaccine_count = item.getProperty("count");
+        }
+        if (inpatient_count == 0) {
+            patientStatus.put("in-patient_vax", 0);
+        } else {
+            patientStatus.put("in-patient_vax", 1.0*inpatient_vaccine_count/inpatient_count);
+        }
+
+        // icu_patient count
+        query  = " Select count(p) as count from(\n" +
+                "MATCH  {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+        "RETURN p)";
+        result = db.query(query, hospital_id);
+        int icu_patient_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            icu_patient_count = item.getProperty("count");
+        }
+        patientStatus.put("icu_patient_count", icu_patient_count);
+
+        // icu_patient_vax
+        query = " Select count(p) as count from(\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+                "RETURN p)";
+        result = db.query(query, hospital_id);
+        int icu_patient_vax_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            icu_patient_vax_count = item.getProperty("count");
+        }
+        if (icu_patient_count == 0) {
+            patientStatus.put("icu_patient_vax", 0);
+        } else {
+            patientStatus.put("icu_patient_vax", 1.0*icu_patient_vax_count/icu_patient_count);
+        }
+
+        // get the status 3 patient count
+        query  = " Select count(p) as count from(\n" +
+                "MATCH  {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+                "RETURN p)";
+        result = db.query(query, hospital_id);
+        int status3_patient_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            status3_patient_count = item.getProperty("count");
+        }
+        patientStatus.put("patient_vent_count", status3_patient_count);
+
+        // get the status 3 patient vax count
+        query = " Select count(p) as count from(\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+                "RETURN p)";
+        result = db.query(query, hospital_id);
+        int status3_patient_vax_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            status3_patient_vax_count = item.getProperty("count");
+        }
+        if (status3_patient_count == 0) {
+            patientStatus.put("patient_vent_vax", 0);
+        } else {
+            patientStatus.put("patient_vent_vax", 1.0*status3_patient_vax_count/status3_patient_count);
+        }
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(patientStatus);
+        System.out.println(jsonString);
+        result.close();
+        db.close();
+        orient.close();
+        return jsonString;
+    }
+    public String getPatientStatusofAllHospital() {
+        OrientDB orient;
+        ODatabaseSession db;
+        orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
+        db = orient.open(dbName, "root", "rootpwd");
+
+        Map<String , Object> patientStatus = new HashMap<>();
+        // get the number of patients
+
+        String query = "Select count(*) as count from(\n" +
+                "MATCH {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h}\n" +
+                "RETURN p\n" +
+                "  ) ";
+        OResultSet result = db.query(query);
+        int inpatient_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            inpatient_count = item.getProperty("count");
+        }
+        patientStatus.put("in-patient_count", inpatient_count);
+
+        // get in-patient_vaccine, who has received vaccine
+        query  = "Select count(p) as count from(\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h }\n" +
+                "RETURN p)";
+        OResultSet result = db.query(query);
+        int inpatient_vaccine_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            inpatient_vaccine_count = item.getProperty("count");
+        }
+        if (inpatient_count == 0) {
+            patientStatus.put("in-patient_vax", 0);
+        } else {
+            patientStatus.put("in-patient_vax", 1.0*inpatient_vaccine_count/inpatient_count);
+        }
+
+        // icu_patient count
+        query  = " Select count(p) as count from(\n" +
+                "MATCH  {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h } \n"+
+                "RETURN p)";
+        result = db.query(query);
+        int icu_patient_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            icu_patient_count = item.getProperty("count");
+        }
+        patientStatus.put("icu_patient_count", icu_patient_count);
+
+        // icu_patient_vax
+        query = " Select count(p) as count from(\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h } \n"+
+                "RETURN p)";
+        result = db.query(query);
+        int icu_patient_vax_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            icu_patient_vax_count = item.getProperty("count");
+        }
+        if (icu_patient_count == 0) {
+            patientStatus.put("icu_patient_vax", 0);
+        } else {
+            patientStatus.put("icu_patient_vax", 1.0*icu_patient_vax_count/icu_patient_count);
+        }
+
+        // get the status 3 patient count
+        query  = " Select count(p) as count from(\n" +
+                "MATCH  {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h } \n"+
+                "RETURN p)";
+        result = db.query(query);
+        int status3_patient_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            status3_patient_count = item.getProperty("count");
+        }
+        patientStatus.put("patient_vent_count", status3_patient_count);
+
+        // get the status 3 patient vax count
+        query = " Select count(p) as count from(\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h} \n"+
+                "RETURN p)";
+        result = db.query(query);
+        int status3_patient_vax_count = 0;
+        if (result.hasNext()) {
+            OResult item = result.next();
+            status3_patient_vax_count = item.getProperty("count");
+        }
+        if (status3_patient_count == 0) {
+            patientStatus.put("patient_vent_vax", 0);
+        } else {
+            patientStatus.put("patient_vent_vax", 1.0*status3_patient_vax_count/status3_patient_count);
+        }
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(patientStatus);
+        System.out.println(jsonString);
+        result.close();
+        db.close();
+        orient.close();
+        return jsonString;
+    }
+}
 
 
 

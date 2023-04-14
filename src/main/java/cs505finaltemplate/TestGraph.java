@@ -91,8 +91,10 @@ public class TestGraph
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String test = graphDBEngine.getConfirmedContacts("89f0c5be-d834-11ed-a071-e4b318c5b66f");
+        String test = graphDBEngine.getPossibleContacts("89f0c5be-d834-11ed-a071-e4b318c5b66f");
+
 System.out.println("look here");
+
         System.out.println(test);
 
 //        graphDBEngine.closeBD();

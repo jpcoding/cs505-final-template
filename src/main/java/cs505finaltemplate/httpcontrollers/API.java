@@ -138,13 +138,28 @@ public class API {
     }
 
     @GET
-    @Path("/getpossiblecontacts")
+    @Path("/getpossiblecontacts/{patient_mrn}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPossibleContacts() {
+    public Response getPossibleContacts((@PathParam("patient_mrn") String patient_mrn) {
+        String responseString = "{}";
+        try {
+            responseString = Launcher.graphDBEngine.getPossibleContacts(patient_mrn);
+        } catch (Exception ex) {
+            return printException(ex);
+        }
+        return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
+    }
+
+    @GET
+    @Path("/getpatientstatus/{hospital_id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPatientStatus((@PathParam("hospital_id") String hospital_id ) {
         // @todo: implement
         String responseString = "{}";
         try {
-
+            responseString = Launcher.graphDBEngine.getPatientStatusofOneHospital(hospital_id);
+        } catch (Exception ex) {
+            return printException(ex);
         } catch (Exception ex) {
             return printException(ex);
         }
@@ -154,16 +169,19 @@ public class API {
     @GET
     @Path("/getpatientstatus")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPatientStatus() {
+    public Response getPatientStatus( ) {
         // @todo: implement
         String responseString = "{}";
         try {
-
+            responseString = Launcher.graphDBEngine.getPatientStatusofAllHospital();
+        } catch (Exception ex) {
+            return printException(ex);
         } catch (Exception ex) {
             return printException(ex);
         }
         return Response.ok(responseString).header("Access-Control-Allow-Origin", "*").build();
     }
+
 
     private Response printException(Exception ex) {
 
