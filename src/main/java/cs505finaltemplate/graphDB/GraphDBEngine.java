@@ -514,7 +514,7 @@ public class GraphDBEngine {
         query  = "Select count(p) as count from(\n" +
                 "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id =?) }\n" +
                 "RETURN p)";
-        OResultSet result = db.query(query, hospital_id);
+         result = db.query(query, hospital_id);
         int inpatient_vaccine_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
@@ -614,7 +614,7 @@ public class GraphDBEngine {
         query  = "Select count(p) as count from(\n" +
                 "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h }\n" +
                 "RETURN p)";
-        OResultSet result = db.query(query);
+         result = db.query(query);
         int inpatient_vaccine_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
