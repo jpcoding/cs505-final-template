@@ -1,27 +1,7 @@
 [
     {
-        "vaccination_id": 2,
-        "patient_name": "Mark Baez",
-        "patient_mrn": "89f0c5be-d834-11ed-a071-e4b318c5b66f"
-    },
-    {
-        "vaccination_id": 2,
-        "patient_name": "David Keeling",
-        "patient_mrn": "89f0c88e-d834-11ed-a071-e4b318c5b66f"
-    },
-    {
         "vaccination_id": 9,
-        "patient_name": "Dominga Lia",
-        "patient_mrn": "89f0c9f6-d834-11ed-a071-e4b318c5b66f"
-    },
-    {
-        "vaccination_id": 1,
-        "patient_name": "James Villarreal",
-        "patient_mrn": "89f0cb54-d834-11ed-a071-e4b318c5b66f"
-    },
-    {
-        "vaccination_id": 2,
-        "patient_name": "Sean Betts",
-        "patient_mrn": "89f0ce60-d834-11ed-a071-e4b318c5b66f"
+        "patient_name": "Julia Sallade",
+        "patient_mrn": "a16e771e-dbc1-11ed-9c9f-3af4def4deda"
     }
 ]

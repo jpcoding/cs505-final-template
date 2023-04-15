@@ -8,7 +8,7 @@ def pub(virtualhost, message, exchange_name):
     # on the / virtual host using the username "guest" and password "guest"
     username = 'guest'
     password = 'guest'
-    hostname = 'localhost'
+    hostname = '192.168.64.12'
 
     credentials = pika.PlainCredentials(username, password)
     parameters = pika.ConnectionParameters(hostname,
@@ -20,11 +20,10 @@ def pub(virtualhost, message, exchange_name):
 
     channel = connection.channel()
 
-    exchange_name = 'patient_list'
-
+    
     channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
 
-    routing_key = 'patient_list'
+    routing_key = exchange_name
 
     channel.basic_publish(
          exchange=exchange_name, routing_key=routing_key, body=message)

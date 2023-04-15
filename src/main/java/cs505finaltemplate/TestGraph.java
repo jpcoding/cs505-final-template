@@ -94,6 +94,12 @@ public class TestGraph
         String test = graphDBEngine.getPossibleContacts("89f0c5be-d834-11ed-a071-e4b318c5b66f");
 
 System.out.println("look here");
+        try {
+            Launcher.graphDBEngine.getPatientStatusofAllHospital();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
         System.out.println(test);
 

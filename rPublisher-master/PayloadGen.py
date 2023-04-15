@@ -4,7 +4,7 @@ import uuid
 import json
 
 
-patientCode = ["0", "1"]
+patientCode = ["1","1"]
 event_master = []
 contact_master = []
 patient_list = []
@@ -46,6 +46,7 @@ def getpayload(zip_map, count):
 
     for n in range(random.randint(1, count)):
         contact_master.append(str(uuid.uuid1()))
+    
 
     for contact in contact_master:
         person = getperson(zip_map, count, contact)
@@ -81,6 +82,8 @@ def getperson(zip_map, count, patient_mrn):
     patient_name = names.get_first_name() + ' ' + names.get_last_name()
     patient_zipcode = str(random.choice(list(zip_map.items()))[0])
     patient_status_code = random.choice(patientCode)
+    
+
 
     patientRecord = dict()
     patientRecord["testing_id"] = testing_id

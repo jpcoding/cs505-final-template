@@ -22,6 +22,12 @@ public class TestingData {
         this.contact_list = contact_list;
         this.event_list = event_list;
     }
+
+    public boolean isValid() {
+
+        boolean patient_status_valid = this.patient_status!=null &&  ((this.patient_status.equals("1")) || (this.patient_status.equals("0"))) ;
+        return this.patient_name != null && this.patient_mrn != null && this.patient_zipcode != null && this.contact_list!=null &&  this.event_list!=null && patient_status_valid;
+    }
 }
 
 

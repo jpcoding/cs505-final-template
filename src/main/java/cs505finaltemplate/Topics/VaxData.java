@@ -15,4 +15,8 @@ public class VaxData{
         this.patient_name = patient_name;
         this.patient_mrn = patient_mrn;
     }
+
+    public boolean isValid() {
+        return !(vaccination_id == null || patient_name == null || patient_mrn == null);
+    }
 }
