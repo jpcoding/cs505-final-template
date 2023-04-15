@@ -11,6 +11,7 @@ import cs505finaltemplate.graphDB.GraphDBEngine;
 import io.siddhi.query.api.expression.condition.In;
 
 import java.lang.reflect.Type;
+import java.security.acl.LastOwnerException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,67 +76,49 @@ public class TopicConnector {
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 
                 String message = new String(delivery.getBody(), "UTF-8");
-                // System.out.println(" [x] Received Patient List Batch'" +
-                // delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
-
                 List<TestingData> incomingList = gson.fromJson(message, typeListTestingData);
-                // Gson patient_info = new Gson();
-                // String patient_info_jsonstring = patient_info.toJson(incomingList.get(0));
 
-                // Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+                Map<Integer, Integer> zipCount = new HashMap<>();
 
                 for (TestingData testingData : incomingList) {
 
                     // Check if this data is perfect data first.
                     Gson patient_info = new Gson();
                     String patient_info_jsonstring = patient_info.toJson(testingData);
-//                    System.out.println(patient_info_jsonstring);
+                    // System.out.println(patient_info_jsonstring);
                     try {
                         System.out.println(patient_info_jsonstring);
                         Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    Map<String,String> zip_entry = new HashMap<>();
-                    zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
-                    Map<String, String> patient_status_entry = new HashMap<>();
-                    patient_status_entry.put("patient_status", testingData.patient_status);
 
-                    Map<String, Object> combinedMap = new HashMap<>();
-                    combinedMap.putAll(zip_entry);
-                    combinedMap.putAll(patient_status_entry);
-                    System.out.println("combined map: " + combinedMap.toString());// @todo: delete debug line
-
-                    Gson gson = new Gson();
-                    String testInput = gson.toJson(combinedMap);
-                    Launcher.cepEngine.input("testInStream", testInput);
-
-                    // Launcher.graphDBEngine.addPatient(testingData);
-                    // System.out.println(patient_info_jsonstring);
-                    // uncomment for debug
-                    // System.out.println("testInput: " + testInput);
-
-                    // Launcher.graphDBEngine.addPatient(testingData);
-
-                    // do something else with each record
-                    /*
-                     * System.out.println("*Java Class*"); System.out.println("\ttesting_id = " +
-                     * testingData.testing_id); System.out.println("\tpatient_name = " +
-                     * testingData.patient_name); System.out.println("\tpatient_mrn = " +
-                     * testingData.patient_mrn); System.out.println("\tpatient_zipcode = " +
-                     * testingData.patient_zipcode); System.out.println("\tpatient_status = " +
-                     * testingData.patient_status); System.out.println("\tcontact_list = " +
-                     * testingData.contact_list); System.out.println("\tevent_list = " +
-                     * testingData.event_list);
-                     */
-
-                    // TODO
-                    // Data to send to orientDB
-                    // Map<String,String> zip_entry = new HashMap<>();
-                    // zip_entry.put("zip_code",String.valueOf(testingData.patient_zipcode));
-
+                    // if status is 1 and zip already in map, increment. else add to map.
+                    if (testingData.patient_status.equals("1")) {
+                        int zipcode = Integer.parseInt(testingData.patient_zipcode);
+                        if (zipCount.containsKey(zipcode)) {
+                            zipCount.put(zipcode, zipCount.get(zipcode) + 1);
+                        } else {
+                            zipCount.put(zipcode, 1);
+                        }
+                    }
                 }
+                Gson gson = new Gson();
+                Map<String, Integer> inputMap = new HashMap<>();
 
+                for (Map.Entry<Integer, Integer> entry : zipCount.entrySet()) {
+                    inputMap.put("zip_code", entry.getKey());
+                    inputMap.put("count", entry.getValue());
+                    String inputJson = gson.toJson(inputMap);
+
+                    Launcher.cepEngine.input("testInStream", inputJson);
+                }
+                Launcher.lastCEPOutput.clear();
+                Launcher.lastCEPOutput.putAll(zipCount);
+
+                // @todo: delete debug lines
+                System.out.println("Last CEP Output: " + Launcher.lastCEPOutput.toString());
+                System.out.println("Alert List: " + Launcher.alert_list.toString());
             };
 
             channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {

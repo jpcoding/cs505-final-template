@@ -1,16 +1,12 @@
 package cs505finaltemplate.CEP;
 
 import com.google.gson.Gson;
-import com.rabbitmq.client.RpcClient.Response;
-
 import cs505finaltemplate.Launcher;
 import io.siddhi.core.SiddhiAppRuntime;
 import io.siddhi.core.SiddhiManager;
 import io.siddhi.core.stream.output.sink.InMemorySink;
 import io.siddhi.core.util.transport.InMemoryBroker;
-import io.siddhi.query.api.definition.TableDefinition;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -87,16 +83,11 @@ public class CEPEngine {
 
     public void input(String streamName, String jsonPayload) {
         try {
-
             if (topicMap.containsKey(streamName)) {
-                // InMemoryBroker.publish(topicMap.get(streamName),
-                // getByteGenericDataRecordFromString(schemaMap.get(streamName),jsonPayload));
                 InMemoryBroker.publish(topicMap.get(streamName), jsonPayload);
-
             } else {
                 System.out.println("input error : no schema");
             }
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }

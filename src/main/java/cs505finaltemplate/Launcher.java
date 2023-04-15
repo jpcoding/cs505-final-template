@@ -23,7 +23,7 @@ public class Launcher {
     public static TopicConnector topicConnector;
     public static final int WEB_PORT = 8082;
 
-    public static Map<String, String> lastCEPOutput;
+    public static Map<Integer, Integer> lastCEPOutput = new HashMap<>();
     public static List<Integer> alert_list = new ArrayList<Integer>();
 
     public static void main(String[] args) throws IOException {
@@ -36,15 +36,13 @@ public class Launcher {
         System.out.println("Starting CEP...");
 
         inputStreamName = "testInStream";
-        String inputStreamAttributesString = "zip_code string, patient_status string";
+        String inputStreamAttributesString = "zip_code long, count long";
 
         String outputStreamName = "testOutStream";
-        String outputStreamAttributesString = "zip_code string, patient_status string, count long";
+        String outputStreamAttributesString = "zip_code long, count long";
 
-        // @todo: patient_status = 1 or patient_status = "1"?
         // positive case counts per zip_code, grouped by zip_code
-        String alertQueryString = "from testInStream " + "select zip_code, patient_status, count() as count "
-                + "group by zip_code " + "having patient_status == \"1\" " + "insert into testOutStream;";
+        String alertQueryString = "from testInStream " + "select zip_code, count " + "insert into testOutStream;";
 
         cepEngine.createCEP(inputStreamName, outputStreamName, inputStreamAttributesString,
                 outputStreamAttributesString, alertQueryString);
