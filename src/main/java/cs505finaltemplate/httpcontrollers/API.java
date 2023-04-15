@@ -68,15 +68,14 @@ public class API {
     @Path("/reset")
     @Produces(MediaType.APPLICATION_JSON)
     public Response reset() {
-        // @todo: status code 0 means fail, 1 means success. make that work.
         String responseString = "{}";
         try {
 
             Launcher.graphDBEngine.cleadData();
             Launcher.cepEngine.cleanDB();
 
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("status_code", "1");
+            Map<String, Integer> responseMap = new HashMap<>();
+            responseMap.put("reset_status_code", 1);
             responseString = gson.toJson(responseMap);
         } catch (Exception ex) {
             return printException(ex);
@@ -111,9 +110,8 @@ public class API {
         // @todo: (based on RT1) within the same 15 second window.
         String responseString = "{}";
         try {
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("state_status", (Launcher.cepEngine.getStateAlert()) ? "1" : "0");
-
+            Map<String, Integer> responseMap = new HashMap<>();
+            responseMap.put("state_status", (Launcher.cepEngine.getStateAlert()) ? 1 : 0);
             responseString = gson.toJson(responseMap);
         } catch (Exception ex) {
             return printException(ex);
@@ -126,7 +124,6 @@ public class API {
     @Path("/getconfirmedcontacts/{patient_mrn}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConfirmedContacts(@PathParam("patient_mrn") String patient_mrn) {
-        // @todo: implement
         String responseString = "{}";
         try {
             responseString = Launcher.graphDBEngine.getConfirmedContacts(patient_mrn);
@@ -154,7 +151,6 @@ public class API {
     @Path("/getpatientstatus/{hospital_id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPatientStatus(@PathParam("hospital_id") String hospital_id) {
-        // @todo: implement
         String responseString = "{}";
         try {
             responseString = Launcher.graphDBEngine.getPatientStatusofOneHospital(hospital_id);
@@ -168,7 +164,6 @@ public class API {
     @Path("/getpatientstatus")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPatientStatus() {
-        // @todo: implement
         String responseString = "{}";
         try {
             responseString = Launcher.graphDBEngine.getPatientStatusofAllHospital();
