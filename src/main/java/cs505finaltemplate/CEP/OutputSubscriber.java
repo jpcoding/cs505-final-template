@@ -6,7 +6,6 @@ import cs505finaltemplate.Launcher;
 import io.siddhi.core.util.transport.InMemoryBroker;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Map;
 
 public class OutputSubscriber implements InMemoryBroker.Subscriber {
@@ -42,7 +41,7 @@ public class OutputSubscriber implements InMemoryBroker.Subscriber {
                 if (currentCount >= lastCount * 2 && !Launcher.alert_list.contains(zipCode)) {
                     Launcher.alert_list.add(zipCode);
                 } else if (currentCount < lastCount * 2 && Launcher.alert_list.contains(zipCode)) {
-                    Launcher.alert_list.remove(zipCode);
+                    Launcher.alert_list.remove(Launcher.alert_list.indexOf(zipCode));
                 }
             }
         } catch (Exception ex) {
