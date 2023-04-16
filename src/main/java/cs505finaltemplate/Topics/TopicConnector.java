@@ -103,6 +103,7 @@ public class TopicConnector {
                         }
                     }
                 }
+                // feed positive zip code counts into output subscriber
                 Gson gson = new Gson();
                 Map<String, Integer> inputMap = new HashMap<>();
 
@@ -113,12 +114,14 @@ public class TopicConnector {
 
                     Launcher.cepEngine.input("testInStream", inputJson);
                 }
+                // update lastCEPOutput
                 Launcher.lastCEPOutput.clear();
                 Launcher.lastCEPOutput.putAll(zipCount);
 
-                // @todo: delete debug lines
+                // @todo: delete debug lines when done
                 System.out.println("Last CEP Output: " + Launcher.lastCEPOutput.toString());
-                System.out.println("Alert List: " + Launcher.alert_list.toString());
+                System.out.println("Alert list: " + Launcher.alert_list.toString());
+                System.out.println("Statewide alert: " + ((Launcher.cepEngine.getStateAlert()) ? "ON" : "OFF"));
             };
 
             channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
