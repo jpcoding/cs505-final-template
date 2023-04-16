@@ -87,19 +87,15 @@ public class TopicConnector {
                 Map<Integer, Integer> zipCount = new HashMap<>();
 
                 for (TestingData testingData : incomingList) {
-
-//                    if(!testingData.isValid()) {
-//                        continue;
-//                    }
+                    //Check data integrity
+                    if(!testingData.isValid()) {
+                        continue;
+                    }
                     // Check if this data is perfect data first.
                     Gson patient_info = new Gson();
                     String patient_info_jsonstring = patient_info.toJson(testingData);
-
-
-
-                    // System.out.println(patient_info_jsonstring);
                     try {
-                        System.out.println(patient_info_jsonstring);
+//                        System.out.println(patient_info_jsonstring);
                         Launcher.graphDBEngine.addPatient(testingData);
                     } catch (Exception e) {
                         e.printStackTrace();

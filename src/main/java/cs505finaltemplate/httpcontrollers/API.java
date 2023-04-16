@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedHashMap;
+
 
 // TODO 
 // APIS 
@@ -36,10 +38,15 @@ public class API {
     public Response getTeam() {
         String responseString = "{}";
         try {
-            Map<String, String> responseMap = new HashMap<>();
-            responseMap.put("team_name", "templateTeam");
+            Map<String, Object> responseMap = new LinkedHashMap<>();
+            responseMap.put("team_name", "Team 8");
             responseMap.put("Team_members_sids", "[12028230,12648912]");
-            responseMap.put("app_status_code", "1");
+
+            if (Launcher.graphDBEngine != null || Launcher.cepEngine != null) {
+                responseMap.put("app_status_code", 1);
+            } else {
+                responseMap.put("app_status_code", 0);
+            }
 
             responseString = gson.toJson(responseMap);
 
