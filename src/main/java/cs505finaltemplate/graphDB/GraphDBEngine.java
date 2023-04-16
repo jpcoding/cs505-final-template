@@ -12,26 +12,19 @@ import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import cs505finaltemplate.Topics.HospitalData;
 import cs505finaltemplate.Topics.TestingData;
 import cs505finaltemplate.Topics.VaxData;
-import com.orientechnologies.orient.core.db.ODatabaseSession;
-import com.orientechnologies.orient.core.db.OrientDB;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.db.ODatabaseType;
-
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
-
 import com.google.gson.Gson;
+import java.util.LinkedHashMap;
+
 
 
 public class GraphDBEngine {
 
     private String dbName;
-
-    //!!! CODE HERE IS FOR EXAMPLE ONLY, YOU MUST CHECK AND MODIFY!!!
     public GraphDBEngine(String dbName) {
         OrientDB orient;
         ODatabaseSession db;
@@ -91,11 +84,8 @@ public class GraphDBEngine {
         if (db.getClass("vaccinated_with") == null) {
             db.createEdgeClass("vaccinated_with");
         }
-
-
         db.close();
-//        orient.close();
-
+        orient.close();
     }
 
     public void resetDB(OrientDB db, String dbName) {
@@ -110,11 +100,6 @@ public class GraphDBEngine {
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
         resetDB(orient, dbName);
     }
-
-//    public void closeBD() {
-//
-//        orient.close();
-//    }
 
     public void cleadData() {
         OrientDB orient;
@@ -137,7 +122,7 @@ public class GraphDBEngine {
         return result;
     }
 
-    private void addPatient(TestingData patient) {
+   public void addPatient(TestingData patient) {
         // If the node already exists, update it
         // If the node does not exist, create it
         // If the node has a contact, create an edge between the two nodes
@@ -162,6 +147,7 @@ public class GraphDBEngine {
                 existingPatient.setProperty("patient_status", patient.patient_status);
                 existingPatient.setProperty("contact_list", patient.contact_list);
                 existingPatient.setProperty("event_list", patient.event_list);
+                existingPatient.setProperty("hospital_status",0);
                 // add event edges and nodes
                 addEvent(patient, existingPatient, db);
                 // add contacts
@@ -179,6 +165,7 @@ public class GraphDBEngine {
             newPatient.setProperty("patient_status", patient.patient_status);
             newPatient.setProperty("contact_list", patient.contact_list);
             newPatient.setProperty("event_list", patient.event_list);
+            newPatient.setProperty("hospital_status",0);
             newPatient.save();
             // add event edges and nodes
             addEvent(patient, newPatient, db);
@@ -231,6 +218,7 @@ public class GraphDBEngine {
                     existingHospital = patientRS.next();
                     if (existingHospital.isVertex()) {
                         OVertex thisPatient = existingHospital.getVertex().get();
+                        thisPatient.setProperty("hospital_status", hospital.patient_status);
                         // If there is no edge between the patient and the hospital, create one
                         String edgeQuery = "SELECT FROM hospitalized_at WHERE out = ? AND in = ?";
                         OResultSet edgeRS = db.query(edgeQuery, thisPatient, thisHospital);
@@ -244,6 +232,7 @@ public class GraphDBEngine {
                     OVertex newPatient = db.newVertex("patient");
                     newPatient.setProperty("patient_mrn", hospital.patient_mrn);
                     newPatient.setProperty("patient_name", hospital.patient_name);
+                    newPatient.setProperty("hospital_status", hospital.patient_status);
                     newPatient.save();
                     OEdge edge = newPatient.addEdge(thisHospital, "hospitalized_at");
                     edge.save();
@@ -263,6 +252,7 @@ public class GraphDBEngine {
                 OResult patient = patientRS.next();
                 if (patient.isVertex()) {
                     OVertex thisPatient = patient.getVertex().get();
+                    thisPatient.setProperty("hospital_status", hospital.patient_status);
                     // if there is no edge between the patient and the hospital, create one
                     String edgeQuery = "SELECT FROM hospitalized_at WHERE out = ? AND in = ?";
                     OResultSet edgeRS = db.query(edgeQuery, thisPatient, newHospital);
@@ -276,6 +266,7 @@ public class GraphDBEngine {
                 OVertex newPatient = db.newVertex("patient");
                 newPatient.setProperty("patient_mrn", hospital.patient_mrn);
                 newPatient.setProperty("patient_name", hospital.patient_name);
+                newPatient.setProperty("hospital_status", hospital.patient_status);
                 newPatient.save();
                 // create edge
                 // If there is no edge between the patient and the hospital, create one
@@ -319,6 +310,7 @@ public class GraphDBEngine {
                     } else {
                         OVertex newPatient = db.newVertex("patient");
                         newPatient.setProperty("patient_mrn", vaccine.patient_mrn);
+                        newPatient.setProperty("hospital_status", 0);
                         newPatient.save();
                         OEdge edge = newPatient.addEdge(thisVaccine, "vaccinated_with");
                         edge.save();
@@ -346,6 +338,7 @@ public class GraphDBEngine {
                     OVertex newPatient = db.newVertex("patient");
                     newPatient.setProperty("patient_mrn", vaccine.patient_mrn);
                     newPatient.setProperty("patient_name", vaccine.patient_name);
+                    newPatient.setProperty("patient_dob", 0);
                     newPatient.save();
                     OEdge edge = newPatient.addEdge(newVaccine, "vaccinated_with");
                     edge.save();
@@ -360,6 +353,10 @@ public class GraphDBEngine {
     // Only used in the addPatient method
     private void addEvent(TestingData patient, OVertex existingPatient, ODatabaseSession db)
     {
+
+        System.out.println("patient_event:");
+        System.out.println(patient.event_list);
+        System.out.println("patient_event:");
 
         for (String event : patient.event_list) {
             String query1 = "SELECT FROM event WHERE event_id = ?";
@@ -412,6 +409,7 @@ public class GraphDBEngine {
                 } else {
                     OVertex newContact = db.newVertex("patient");
                     newContact.setProperty("patient_mrn", contact);
+                    newContact.setProperty("hospital_status", 0);
                     newContact.save();
                     OEdge edge = existingPatient.addEdge(newContact, "contact_with");
                     edge.save();
@@ -430,18 +428,16 @@ public class GraphDBEngine {
                 "FROM (SELECT FROM patient WHERE patient_mrn = ?) \n" +
                 "WHILE $depth <= 2)\n" +
                 "WHERE @class = 'patient'\n";
-//        query = "SELECT FROM (TRAVERSE in(), out() \n" +
-//                "FROM (SELECT FROM patient WHERE patient_mrn = ?) \n" +
-//                "WHILE $depth <= 2)\n" +
-//                "WHERE @class = 'patient' AND @rid <> (SELECT FROM patient WHERE patient_mrn = ?).@rid\n";
         OResultSet rs = db.query(query, patient_mrn);
         List<String> contacts = new ArrayList<>();
+        if(!rs.hasNext()) {
+            System.out.println("This patient is not in the database yet.");
+            return "This patient is not in the database yet or dose not have contacts.";
+        }
         while (rs.hasNext()) {
             OResult item = rs.next();
-//            if (!item.getProperty("patient_mrn").equals(patient_mrn)) {
                 contacts.add(item.getProperty("patient_mrn"));
                 System.out.println("contact: " + item.getProperty("patient_mrn"));
-//            }
         }
         // create a hashmap to store the contact list
         HashMap<String, List<String>> contactList = new HashMap<>();
@@ -468,6 +464,10 @@ public class GraphDBEngine {
         db = orient.open(dbName, "root", "rootpwd");
         OResultSet rs = db.query(query, patient_mrn);
         Map<String, List<String>> possibleContacts = new HashMap<>();
+        if(!rs.hasNext()) {
+            System.out.println("This patient is not in the database yet.");
+            return "This patient is not in the database yet or dose not have contacts.";
+        }
         while (rs.hasNext()) {
             OResult item = rs.next();
             String event_id = item.getProperty("e.event_id");
@@ -495,27 +495,32 @@ public class GraphDBEngine {
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
         db = orient.open(dbName, "root", "rootpwd");
 
-        Map<String , Object> patientStatus = new HashMap<>();
+        Map<String , Object> patientStatus = new LinkedHashMap<>();
         // get the number of patients
 
         String query = "Select count(*) as count from(\n" +
-                "MATCH {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id = ?) }\n" +
+                "MATCH {Class: patient, as: p, where:(hospital_status = 1 )} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id = ?) }\n" +
                 "RETURN p\n" +
                 "  ) ";
         OResultSet result = db.query(query, hospital_id);
-        int inpatient_count = 0;
+        long inpatient_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             inpatient_count = item.getProperty("count");
         }
+        else
+        {
+            return "hospital_id is not valid";
+        }
+        System.out.println("inpatient_count = " + inpatient_count);
         patientStatus.put("in-patient_count", inpatient_count);
 
         // get in-patient_vaccine, who has received vaccine
         query  = "Select count(p) as count from(\n" +
-                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id =?) }\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p , where:(hospital_status = 1 )} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id =?) }\n" +
                 "RETURN p)";
          result = db.query(query, hospital_id);
-        int inpatient_vaccine_count = 0;
+        long inpatient_vaccine_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             inpatient_vaccine_count = item.getProperty("count");
@@ -523,15 +528,15 @@ public class GraphDBEngine {
         if (inpatient_count == 0) {
             patientStatus.put("in-patient_vax", 0);
         } else {
-            patientStatus.put("in-patient_vax", 1.0*inpatient_vaccine_count/inpatient_count);
+            patientStatus.put("in-patient_vax", Math.round(100.0*inpatient_vaccine_count/inpatient_count)/100.0);
         }
 
         // icu_patient count
         query  = " Select count(p) as count from(\n" +
-                "MATCH  {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+                "MATCH  {Class: patient, as: p, where:(hospital_status = 2 ) } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
         "RETURN p)";
         result = db.query(query, hospital_id);
-        int icu_patient_count = 0;
+        long icu_patient_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             icu_patient_count = item.getProperty("count");
@@ -540,10 +545,10 @@ public class GraphDBEngine {
 
         // icu_patient_vax
         query = " Select count(p) as count from(\n" +
-                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(hospital_status = 2 ) } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
                 "RETURN p)";
         result = db.query(query, hospital_id);
-        int icu_patient_vax_count = 0;
+        long icu_patient_vax_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             icu_patient_vax_count = item.getProperty("count");
@@ -551,15 +556,15 @@ public class GraphDBEngine {
         if (icu_patient_count == 0) {
             patientStatus.put("icu_patient_vax", 0);
         } else {
-            patientStatus.put("icu_patient_vax", 1.0*icu_patient_vax_count/icu_patient_count);
+            patientStatus.put("icu_patient_vax", Math.round(100.0*icu_patient_vax_count/icu_patient_count)/100.0);
         }
 
         // get the status 3 patient count
         query  = " Select count(p) as count from(\n" +
-                "MATCH  {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+                "MATCH  {Class: patient, as: p, where:(hospital_status = 3 ) } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
                 "RETURN p)";
         result = db.query(query, hospital_id);
-        int status3_patient_count = 0;
+        long status3_patient_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             status3_patient_count = item.getProperty("count");
@@ -568,10 +573,10 @@ public class GraphDBEngine {
 
         // get the status 3 patient vax count
         query = " Select count(p) as count from(\n" +
-                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(hospital_status = 3 ) } -hospitalized_at->{Class: hospital, as: h, where:(hospital_id = ?) } \n"+
                 "RETURN p)";
         result = db.query(query, hospital_id);
-        int status3_patient_vax_count = 0;
+        long status3_patient_vax_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             status3_patient_vax_count = item.getProperty("count");
@@ -579,7 +584,7 @@ public class GraphDBEngine {
         if (status3_patient_count == 0) {
             patientStatus.put("patient_vent_vax", 0);
         } else {
-            patientStatus.put("patient_vent_vax", 1.0*status3_patient_vax_count/status3_patient_count);
+            patientStatus.put("patient_vent_vax", Math.round(100.0*status3_patient_vax_count/status3_patient_count)/100.0);
         }
         Gson gson = new Gson();
         String jsonString = gson.toJson(patientStatus);
@@ -595,27 +600,27 @@ public class GraphDBEngine {
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
         db = orient.open(dbName, "root", "rootpwd");
 
-        Map<String , Object> patientStatus = new HashMap<>();
+        Map<String , Object> patientStatus = new LinkedHashMap<>();
         // get the number of patients
 
         String query = "Select count(*) as count from(\n" +
-                "MATCH {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h}\n" +
+                "MATCH {Class: patient, as: p, where:(hospital_status = 1 ) } -hospitalized_at-> {Class: hospital, as: h}\n" +
                 "RETURN p\n" +
                 "  ) ";
         OResultSet result = db.query(query);
-        int inpatient_count = 0;
+        long inpatient_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             inpatient_count = item.getProperty("count");
         }
         patientStatus.put("in-patient_count", inpatient_count);
-
+        System.out.println("inpatient_count = " + inpatient_count);
         // get in-patient_vaccine, who has received vaccine
         query  = "Select count(p) as count from(\n" +
-                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p} -hospitalized_at->{Class: hospital, as: h }\n" +
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(hospital_status = 1 )} -hospitalized_at->{Class: hospital, as: h }\n" +
                 "RETURN p)";
          result = db.query(query);
-        int inpatient_vaccine_count = 0;
+        long inpatient_vaccine_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             inpatient_vaccine_count = item.getProperty("count");
@@ -623,15 +628,15 @@ public class GraphDBEngine {
         if (inpatient_count == 0) {
             patientStatus.put("in-patient_vax", 0);
         } else {
-            patientStatus.put("in-patient_vax", 1.0*inpatient_vaccine_count/inpatient_count);
+            patientStatus.put("in-patient_vax", Math.round(100.0*inpatient_vaccine_count/inpatient_count)/100.0);
         }
 
         // icu_patient count
         query  = " Select count(p) as count from(\n" +
-                "MATCH  {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h } \n"+
+                "MATCH  {Class: patient, as: p, where:(hospital_status = 2 ) } -hospitalized_at->{Class: hospital, as: h } \n"+
                 "RETURN p)";
         result = db.query(query);
-        int icu_patient_count = 0;
+        long icu_patient_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             icu_patient_count = item.getProperty("count");
@@ -640,10 +645,10 @@ public class GraphDBEngine {
 
         // icu_patient_vax
         query = " Select count(p) as count from(\n" +
-                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"2\") } -hospitalized_at->{Class: hospital, as: h } \n"+
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(hospital_status = 2 ) } -hospitalized_at->{Class: hospital, as: h } \n"+
                 "RETURN p)";
         result = db.query(query);
-        int icu_patient_vax_count = 0;
+        long icu_patient_vax_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             icu_patient_vax_count = item.getProperty("count");
@@ -651,15 +656,15 @@ public class GraphDBEngine {
         if (icu_patient_count == 0) {
             patientStatus.put("icu_patient_vax", 0);
         } else {
-            patientStatus.put("icu_patient_vax", 1.0*icu_patient_vax_count/icu_patient_count);
+            patientStatus.put("icu_patient_vax", Math.round(1.0*icu_patient_vax_count/icu_patient_count*100)/100.0);
         }
 
         // get the status 3 patient count
         query  = " Select count(p) as count from(\n" +
-                "MATCH  {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h } \n"+
+                "MATCH  {Class: patient, as: p, where:(hospital_status = 3 ) } -hospitalized_at->{Class: hospital, as: h } \n"+
                 "RETURN p)";
         result = db.query(query);
-        int status3_patient_count = 0;
+        long status3_patient_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             status3_patient_count = item.getProperty("count");
@@ -668,10 +673,10 @@ public class GraphDBEngine {
 
         // get the status 3 patient vax count
         query = " Select count(p) as count from(\n" +
-                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(patient_status = \"3\") } -hospitalized_at->{Class: hospital, as: h} \n"+
+                "MATCH  {Class: vaccine, as: v} <-vaccinated_with- {Class: patient, as: p, where:(hospital_status = 3 ) } -hospitalized_at->{Class: hospital, as: h} \n"+
                 "RETURN p)";
         result = db.query(query);
-        int status3_patient_vax_count = 0;
+        long status3_patient_vax_count = 0;
         if (result.hasNext()) {
             OResult item = result.next();
             status3_patient_vax_count = item.getProperty("count");
@@ -679,7 +684,7 @@ public class GraphDBEngine {
         if (status3_patient_count == 0) {
             patientStatus.put("patient_vent_vax", 0);
         } else {
-            patientStatus.put("patient_vent_vax", 1.0*status3_patient_vax_count/status3_patient_count);
+            patientStatus.put("patient_vent_vax", Math.round(1.0*status3_patient_vax_count/status3_patient_count*100)/100.0);
         }
         Gson gson = new Gson();
         String jsonString = gson.toJson(patientStatus);

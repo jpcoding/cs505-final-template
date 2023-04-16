@@ -23,4 +23,9 @@ public class HospitalData {
         this.patient_mrn = patient_mrn;
         this.patient_status = patient_status;
     }
+
+    public boolean isValid() {
+        boolean patient_status_valid = (patient_status == 1) || (patient_status == 2) || (patient_status == 3);
+        return hospital_id != null && patient_name != null && patient_mrn != null && patient_status_valid;
+    }
 }

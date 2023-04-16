@@ -25,6 +25,12 @@ public class TopicConnector {
     final Type typeListTestingData = new TypeToken<List<TestingData>>() {
     }.getType();
 
+    final Type typeListHospitalData = new TypeToken<List<HospitalData>>() {
+    }.getType();
+
+    final Type typeListVaxData = new TypeToken<List<VaxData>>() {
+    }.getType();
+
     // private String EXCHANGE_NAME = "patient_data";
     Map<String, String> config;
 
@@ -50,8 +56,8 @@ public class TopicConnector {
             Channel channel = connection.createChannel();
 
             patientListChannel(channel);
-            // hospitalListChannel(channel);
-            // vaxListChannel(channel);
+             hospitalListChannel(channel);
+             vaxListChannel(channel);
 
         } catch (Exception ex) {
             System.out.println("connect Error: " + ex.getMessage());
@@ -81,14 +87,16 @@ public class TopicConnector {
                 Map<Integer, Integer> zipCount = new HashMap<>();
 
                 for (TestingData testingData : incomingList) {
-
+                    //Check data integrity
+                    if(!testingData.isValid()) {
+                        continue;
+                    }
                     // Check if this data is perfect data first.
                     Gson patient_info = new Gson();
                     String patient_info_jsonstring = patient_info.toJson(testingData);
-                    // System.out.println(patient_info_jsonstring);
                     try {
-                        System.out.println(patient_info_jsonstring);
-                        Launcher.graphDBEngine.addPatient(patient_info_jsonstring);
+//                        System.out.println(patient_info_jsonstring);
+                        Launcher.graphDBEngine.addPatient(testingData);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -153,13 +161,16 @@ public class TopicConnector {
                 String message = new String(delivery.getBody(), "UTF-8");
 
                 // convert string to class
-                List<Map<String, String>> incomingList = gson.fromJson(message, typeOfListMap);
-                for (Map<String, String> hospitalData : incomingList) {
-                    int hospital_id = Integer.parseInt(hospitalData.get("hospital_id"));
-                    String patient_name = hospitalData.get("patient_name");
-                    String patient_mrn = hospitalData.get("patient_mrn");
-                    int patient_status = Integer.parseInt(hospitalData.get("patient_status"));
-                    // do something with each each record.
+                List<HospitalData> incomingList = gson.fromJson(message, typeListHospitalData);
+                for (HospitalData hospitalData : incomingList) {
+                    if(!hospitalData.isValid()) {
+                        continue;
+                    }
+                    try {
+                        Launcher.graphDBEngine.addHospital(hospitalData);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
             };
@@ -192,12 +203,16 @@ public class TopicConnector {
                 String message = new String(delivery.getBody(), "UTF-8");
 
                 // convert string to class
-                List<Map<String, String>> incomingList = gson.fromJson(message, typeOfListMap);
-                for (Map<String, String> vaxData : incomingList) {
-                    int vaccination_id = Integer.parseInt(vaxData.get("vaccination_id"));
-                    String patient_name = vaxData.get("patient_name");
-                    String patient_mrn = vaxData.get("patient_mrn");
-                    // do something with each each record.
+                List<VaxData> incomingList = gson.fromJson(message, typeListVaxData);
+                for (VaxData vaxData : incomingList) {
+                    if(!vaxData.isValid()) {
+                        continue;
+                    }
+                    try {
+                        Launcher.graphDBEngine.addVaccine(vaxData);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
             };
