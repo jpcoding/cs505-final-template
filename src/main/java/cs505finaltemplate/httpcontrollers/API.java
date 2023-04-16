@@ -13,13 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-
-// TODO 
-// APIS 
-// getteam 
-// reset 
-//
-
 @Path("/api")
 public class API {
 

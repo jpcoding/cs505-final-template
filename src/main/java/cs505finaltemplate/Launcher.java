@@ -56,11 +56,11 @@ public class Launcher {
         message_config.put("username", "team_8");
         message_config.put("password", "myPassCS505");
         message_config.put("virtualhost", "8");
-//         message_config.put("username", "guest");
-//         message_config.put("password", "guest");
-//         message_config.put("virtualhost", "1");
-//         message_config.put("hostname", "192.168.64.12");
-//         message_config.put("port", "5672");
+        // message_config.put("username", "guest");
+        // message_config.put("password", "guest");
+        // message_config.put("virtualhost", "1");
+        // message_config.put("hostname", "192.168.64.12");
+        // message_config.put("port", "5672");
         topicConnector = new TopicConnector(message_config);
 
         topicConnector.connect();

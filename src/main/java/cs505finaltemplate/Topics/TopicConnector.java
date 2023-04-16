@@ -24,10 +24,8 @@ public class TopicConnector {
     }.getType();
     final Type typeListTestingData = new TypeToken<List<TestingData>>() {
     }.getType();
-
     final Type typeListHospitalData = new TypeToken<List<HospitalData>>() {
     }.getType();
-
     final Type typeListVaxData = new TypeToken<List<VaxData>>() {
     }.getType();
 
@@ -56,8 +54,8 @@ public class TopicConnector {
             Channel channel = connection.createChannel();
 
             patientListChannel(channel);
-             hospitalListChannel(channel);
-             vaxListChannel(channel);
+            hospitalListChannel(channel);
+            vaxListChannel(channel);
 
         } catch (Exception ex) {
             System.out.println("connect Error: " + ex.getMessage());
@@ -87,15 +85,13 @@ public class TopicConnector {
                 Map<Integer, Integer> zipCount = new HashMap<>();
 
                 for (TestingData testingData : incomingList) {
-                    //Check data integrity
-                    if(!testingData.isValid()) {
+                    // Check data integrity
+                    if (!testingData.isValid()) {
                         continue;
                     }
                     // Check if this data is perfect data first.
-                    Gson patient_info = new Gson();
-                    String patient_info_jsonstring = patient_info.toJson(testingData);
                     try {
-//                        System.out.println(patient_info_jsonstring);
+                        // System.out.println(patient_info_jsonstring);
                         Launcher.graphDBEngine.addPatient(testingData);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -163,7 +159,7 @@ public class TopicConnector {
                 // convert string to class
                 List<HospitalData> incomingList = gson.fromJson(message, typeListHospitalData);
                 for (HospitalData hospitalData : incomingList) {
-                    if(!hospitalData.isValid()) {
+                    if (!hospitalData.isValid()) {
                         continue;
                     }
                     try {
@@ -205,7 +201,7 @@ public class TopicConnector {
                 // convert string to class
                 List<VaxData> incomingList = gson.fromJson(message, typeListVaxData);
                 for (VaxData vaxData : incomingList) {
-                    if(!vaxData.isValid()) {
+                    if (!vaxData.isValid()) {
                         continue;
                     }
                     try {
