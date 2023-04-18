@@ -423,17 +423,23 @@ public class GraphDBEngine {
         ODatabaseSession db;
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
         db = orient.open(dbName, "root", "rootpwd");
-        System.out.println("patient_mrn = " + patient_mrn);
+//        System.out.println("patient_mrn = " + patient_mrn);
+        // Check if the patient is in the database
+        String initQuery = "SELECT FROM patient WHERE patient_mrn = ?";
+        OResultSet initrs = db.query(initQuery, patient_mrn);
+        if (!initrs.hasNext()) {
+            initrs.close();
+            System.out.println("This patient is not in the database yet.");
+            return "This patient is not in the database yet.";
+        }
+        initrs.close();
+
         String query = "SELECT FROM (TRAVERSE inE(), outE(), inV(), outV() \n" +
                 "FROM (SELECT FROM patient WHERE patient_mrn = ?) \n" +
                 "WHILE $depth <= 2)\n" +
                 "WHERE @class = 'patient'\n";
         OResultSet rs = db.query(query, patient_mrn);
         List<String> contacts = new ArrayList<>();
-        if(!rs.hasNext()) {
-            System.out.println("This patient is not in the database yet.");
-            return "This patient is not in the database yet or dose not have contacts.";
-        }
         while (rs.hasNext()) {
             OResult item = rs.next();
                 contacts.add(item.getProperty("patient_mrn"));
@@ -462,6 +468,16 @@ public class GraphDBEngine {
         ODatabaseSession db;
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
         db = orient.open(dbName, "root", "rootpwd");
+
+        String initQuery = "SELECT FROM patient WHERE patient_mrn = ?";
+        OResultSet initrs = db.query(initQuery, patient_mrn);
+        if (!initrs.hasNext()) {
+            initrs.close();
+            System.out.println("This patient is not in the database yet.");
+            return "This patient is not in the database yet.";
+        }
+        initrs.close();
+
         OResultSet rs = db.query(query, patient_mrn);
         Map<String, List<String>> possibleContacts = new HashMap<>();
         if(!rs.hasNext()) {
@@ -504,9 +520,11 @@ public class GraphDBEngine {
         String initquery = "SELECT FROM hospital WHERE hospital_id = ?";
         OResultSet initRS = db.query(initquery, hospital_id);
         if (!initRS.hasNext()) {
+            initRS.close();
             System.out.println("This hospital is not in the database yet.");
             return "This hospital is not in the database yet.";
         }
+        initRS.close();
 
         Map<String , Object> patientStatus = new LinkedHashMap<>();
         // get the number of patients
