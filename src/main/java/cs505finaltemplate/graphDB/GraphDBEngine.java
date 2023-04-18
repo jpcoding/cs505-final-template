@@ -480,8 +480,14 @@ public class GraphDBEngine {
                 possibleContacts.put(event_id, list);
             }
         }
+//        Map<String, Map<String, List<String>>> boi = new HashMap<>();
+//        boi.put("contactlist", possibleContacts);
+        List<Object> contact_list= new ArrayList<>();
+        contact_list.add(possibleContacts);
+        Map<String, List<Object>> finalResult= new HashMap<>();
+        finalResult.put("contactlist", contact_list);
         Gson gson = new Gson();
-        String jsonString = gson.toJson(possibleContacts);
+        String jsonString = gson.toJson(finalResult);
         System.out.println(jsonString);
         rs.close();
         db.close();
