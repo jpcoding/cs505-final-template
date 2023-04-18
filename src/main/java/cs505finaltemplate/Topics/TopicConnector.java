@@ -123,9 +123,9 @@ public class TopicConnector {
                 Launcher.lastCEPOutput.putAll(zipCount);
 
                 // @todo: delete debug lines when done
-                System.out.println("Last CEP Output: " + Launcher.lastCEPOutput.toString());
-                System.out.println("Alert list: " + Launcher.alert_list.toString());
-                System.out.println("Statewide alert: " + ((Launcher.cepEngine.getStateAlert()) ? "ON" : "OFF"));
+                // System.out.println("Last CEP Output: " + Launcher.lastCEPOutput.toString());
+                // System.out.println("Alert list: " + Launcher.alert_list.toString());
+                // System.out.println("Statewide alert: " + ((Launcher.cepEngine.getStateAlert()) ? "ON" : "OFF"));
             };
 
             channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {

@@ -94,7 +94,7 @@ public class API {
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("ziplist", Launcher.alert_list);
             responseString = gson.toJson(responseMap);
-            System.out.println("zip alert list response json: " + responseString + "\n");// @todo: remove debug line
+            // System.out.println("zip alert list response json: " + responseString + "\n");// @todo: remove debug line
         } catch (Exception ex) {
             return printException(ex);
         }
