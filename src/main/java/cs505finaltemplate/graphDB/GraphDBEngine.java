@@ -480,10 +480,6 @@ public class GraphDBEngine {
 
         OResultSet rs = db.query(query, patient_mrn);
         Map<String, List<String>> possibleContacts = new HashMap<>();
-        if(!rs.hasNext()) {
-            System.out.println("This patient is not in the database yet.");
-            return "This patient is not in the database yet or dose not have contacts.";
-        }
         while (rs.hasNext()) {
             OResult item = rs.next();
             String event_id = item.getProperty("e.event_id");
