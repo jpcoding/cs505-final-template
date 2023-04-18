@@ -494,9 +494,17 @@ public class GraphDBEngine {
         ODatabaseSession db;
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());
         db = orient.open(dbName, "root", "rootpwd");
+        // Check if the hospital is in the database
+        String initquery = "SELECT FROM hospital WHERE hospital_id = ?";
+        OResultSet initRS = db.query(initquery, hospital_id);
+        if (!initRS.hasNext()) {
+            System.out.println("This hospital is not in the database yet.");
+            return "This hospital is not in the database yet.";
+        }
 
         Map<String , Object> patientStatus = new LinkedHashMap<>();
         // get the number of patients
+
 
         String query = "Select count(*) as count from(\n" +
                 "MATCH {Class: patient, as: p, where:(hospital_status = 1 )} -hospitalized_at->{Class: hospital, as: h, where: (hospital_id = ?) }\n" +
@@ -508,10 +516,7 @@ public class GraphDBEngine {
             OResult item = result.next();
             inpatient_count = item.getProperty("count");
         }
-        else
-        {
-            return "hospital_id is not valid";
-        }
+
         System.out.println("inpatient_count = " + inpatient_count);
         patientStatus.put("in-patient_count", inpatient_count);
 
