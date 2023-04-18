@@ -32,10 +32,10 @@ public class API {
         String responseString = "{}";
         try {
             Map<String, Object> responseMap = new LinkedHashMap<>();
-            responseMap.put("team_name", "Team 8");
+            responseMap.put("team_name", "The DB Dogs");
             responseMap.put("Team_members_sids", "[12028230,12648912]");
 
-            if (Launcher.graphDBEngine != null || Launcher.cepEngine != null) {
+            if (Launcher.graphDBEngine != null && Launcher.cepEngine != null) {
                 responseMap.put("app_status_code", 1);
             } else {
                 responseMap.put("app_status_code", 0);
