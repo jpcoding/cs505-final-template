@@ -107,7 +107,6 @@ public class API {
     public Response getAlertList() {
         // state_status = 0 = not alert, 1 = alert
         // alert on statewide when at least five zipcodes are in alert state
-        // @todo: (based on RT1) within the same 15 second window.
         String responseString = "{}";
         try {
             Map<String, Integer> responseMap = new HashMap<>();
