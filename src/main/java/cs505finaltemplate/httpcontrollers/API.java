@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 @Path("/api")
@@ -31,10 +33,14 @@ public class API {
     public Response getTeam() {
         String responseString = "{}";
         try {
+            // {"team_name":"The DB Dogs","Team_members_sids":"[12028230,12648912]","app_status_code":1}
             Map<String, Object> responseMap = new LinkedHashMap<>();
             responseMap.put("team_name", "The DB Dogs");
-            responseMap.put("Team_members_sids", "[12028230,12648912]");
-
+            // create ID list
+            List<Integer> idList = new ArrayList<>();
+            idList.add(12028230);
+            idList.add(12648912);
+            responseMap.put("Team_members_sids", idList);
             if (Launcher.graphDBEngine != null && Launcher.cepEngine != null) {
                 responseMap.put("app_status_code", 1);
             } else {
