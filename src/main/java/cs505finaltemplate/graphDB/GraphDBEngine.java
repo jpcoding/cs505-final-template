@@ -101,7 +101,7 @@ public class GraphDBEngine {
         resetDB(orient, dbName);
     }
 
-    public void cleadData() {
+    public void clearData() {
         OrientDB orient;
         ODatabaseSession db;
         orient = new OrientDB("remote:pji228.cs.uky.edu", "root", "rootpwd", OrientDBConfig.defaultConfig());

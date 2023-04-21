@@ -71,7 +71,7 @@ public class API {
         String responseString = "{}";
         try {
 
-            Launcher.graphDBEngine.cleadData();
+            Launcher.graphDBEngine.clearData();
             Launcher.cepEngine.cleanDB();
 
             Map<String, Integer> responseMap = new HashMap<>();
