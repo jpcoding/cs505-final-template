@@ -566,7 +566,7 @@ public class GraphDBEngine {
             OResult item = result.next();
             icu_patient_count = item.getProperty("count");
         }
-        patientStatus.put("icu_patient_count", icu_patient_count);
+        patientStatus.put("icu-patient_count", icu_patient_count);
 
         // icu_patient_vax
         query = " Select count(p) as count from(\n" +
@@ -579,9 +579,9 @@ public class GraphDBEngine {
             icu_patient_vax_count = item.getProperty("count");
         }
         if (icu_patient_count == 0) {
-            patientStatus.put("icu_patient_vax", 0);
+            patientStatus.put("icu-patient_vax", 0);
         } else {
-            patientStatus.put("icu_patient_vax", Math.round(100.0*icu_patient_vax_count/icu_patient_count)/100.0);
+            patientStatus.put("icu-patient_vax", Math.round(100.0*icu_patient_vax_count/icu_patient_count)/100.0);
         }
 
         // get the status 3 patient count
@@ -666,7 +666,7 @@ public class GraphDBEngine {
             OResult item = result.next();
             icu_patient_count = item.getProperty("count");
         }
-        patientStatus.put("icu_patient_count", icu_patient_count);
+        patientStatus.put("icu-patient_count", icu_patient_count);
 
         // icu_patient_vax
         query = " Select count(p) as count from(\n" +
@@ -679,9 +679,9 @@ public class GraphDBEngine {
             icu_patient_vax_count = item.getProperty("count");
         }
         if (icu_patient_count == 0) {
-            patientStatus.put("icu_patient_vax", 0);
+            patientStatus.put("icu-patient_vax", 0);
         } else {
-            patientStatus.put("icu_patient_vax", Math.round(1.0*icu_patient_vax_count/icu_patient_count*100)/100.0);
+            patientStatus.put("icu-patient_vax", Math.round(1.0*icu_patient_vax_count/icu_patient_count*100)/100.0);
         }
 
         // get the status 3 patient count
