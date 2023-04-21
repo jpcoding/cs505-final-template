@@ -12,8 +12,9 @@ public class TestingData {
     public List<String> contact_list;
     public List<String> event_list;
 
-    public  TestingData( int testing_id, String patient_name, String patient_mrn, String patient_zipcode, String patient_status, List<String> contact_list, List<String> event_list) {
-        //default constructor
+    public TestingData(int testing_id, String patient_name, String patient_mrn, String patient_zipcode,
+            String patient_status, List<String> contact_list, List<String> event_list) {
+        // default constructor
         this.testing_id = testing_id;
         this.patient_name = patient_name;
         this.patient_mrn = patient_mrn;
@@ -25,10 +26,10 @@ public class TestingData {
 
     public boolean isValid() {
 
-        boolean patient_status_valid = this.patient_status!=null &&  ((this.patient_status.equals("1")) || (this.patient_status.equals("0"))) ;
-        return this.patient_name != null && this.patient_mrn != null && this.patient_zipcode != null && this.contact_list!=null &&  this.event_list!=null && patient_status_valid;
+        boolean patient_status_valid = this.patient_status != null
+                && (this.patient_status.equals("1") || this.patient_status.equals("0"));
+
+        return this.patient_name != null && this.patient_mrn != null && this.patient_zipcode != null
+                && this.contact_list != null && this.event_list != null && patient_status_valid;
     }
 }
-
-
-

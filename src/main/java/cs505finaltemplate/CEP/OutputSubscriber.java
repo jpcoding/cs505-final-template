@@ -31,17 +31,17 @@ public class OutputSubscriber implements InMemoryBroker.Subscriber {
             msgStr = msgStr.substring(9, msgStr.length() - 1);
 
             // 2 rows in the map: zip code and count.
-            Map<String, Integer> msgMap = gson.fromJson(msgStr, mapType);
-            int zipCode = msgMap.get("zip_code");
-            int currentCount = msgMap.get("count");
+            Map<String, Integer> currentMap = gson.fromJson(msgStr, mapType);
+            int currentZip = currentMap.get("zip_code");
+            int currentCount = currentMap.get("count");
 
-            if (!Launcher.lastCEPOutput.isEmpty() && Launcher.lastCEPOutput.containsKey(zipCode)) {
-                int lastCount = Launcher.lastCEPOutput.get(zipCode);
+            if (!Launcher.lastCEPOutput.isEmpty() && Launcher.lastCEPOutput.containsKey(currentZip)) {
+                int lastCount = Launcher.lastCEPOutput.get(currentZip);
                 // 2x jump from last message
-                if (currentCount >= lastCount * 2 && !Launcher.alert_list.contains(zipCode)) {
-                    Launcher.alert_list.add(zipCode);
-                } else if (currentCount < lastCount * 2 && Launcher.alert_list.contains(zipCode)) {
-                    Launcher.alert_list.remove(Launcher.alert_list.indexOf(zipCode));
+                if (currentCount >= lastCount * 2 && !Launcher.alert_list.contains(currentZip)) {
+                    Launcher.alert_list.add(currentZip);
+                } else if (currentCount < lastCount * 2 && Launcher.alert_list.contains(currentZip)) {
+                    Launcher.alert_list.remove(Launcher.alert_list.indexOf(currentZip));
                 }
             }
         } catch (Exception ex) {
